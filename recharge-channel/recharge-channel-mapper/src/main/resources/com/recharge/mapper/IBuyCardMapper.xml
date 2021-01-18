@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IBuyCardMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.BuyCardInfo" >
+        <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="merchant_id" property="merchantId" jdbcType="VARCHAR" />
+        <result column="product_id" property="productId" jdbcType="VARCHAR" />
+        <result column="product_name" property="productName" jdbcType="VARCHAR" />
+        <result column="buy_time" property="buyTime" jdbcType="TIMESTAMP" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="sup_id" property="supId" jdbcType="VARCHAR" />
+        <result column="card_info" property="cardInfo" jdbcType="VARCHAR" />
+        <result column="phone" property="phone" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        order_id,merchant_id,product_id,product_name,buy_time,status,sup_id,card_info,phone
+    </sql>
+
+
+    <insert id="insertOne">
+        INSERT INTO t_buy_card_info (<include refid="Base_Column_List" />)
+        VALUES (#{buyCardInfo.orderId,jdbcType=VARCHAR},#{buyCardInfo.merchantId,jdbcType=VARCHAR},#{buyCardInfo.productId,jdbcType=VARCHAR},#{buyCardInfo.productName,jdbcType=VARCHAR}
+        ,#{buyCardInfo.buyTime,jdbcType=TIMESTAMP},#{buyCardInfo.status,jdbcType=VARCHAR},#{buyCardInfo.supId,jdbcType=VARCHAR},#{buyCardInfo.cardInfo,jdbcType=VARCHAR}
+        ,#{buyCardInfo.phone,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update">
+        UPDATE t_buy_card_info SET buy_time=#{buyCardInfo.buyTime},status=#{buyCardInfo.status},card_info=#{buyCardInfo.cardInfo}
+        where order_id=#{buyCardInfo.orderId} and merchant_id=#{buyCardInfo.merchantId}
+    </update>
+
+    <select id="selectOne" resultMap="BaseResultMap">
+      SELECT <include refid="Base_Column_List" /> FROM   t_buy_card_info where order_id = #{orderId} and merchant_id=#{merchantId}
+    </select>
+</mapper>

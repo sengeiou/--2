@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IChannelOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.ChannelOrder" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="channel_id" property="channelId" jdbcType="VARCHAR" />
+        <result column="channel_name" property="channelName" jdbcType="VARCHAR" />
+        <result column="channel_order_id" property="channelOrderId" jdbcType="VARCHAR" />
+
+        <result column="product_id" property="productId" jdbcType="VARCHAR" />
+        <result column="product_name" property="productName" jdbcType="VARCHAR" />
+        <result column="order_type" property="orderType" jdbcType="INTEGER" />
+
+        <result column="state" property="state" jdbcType="INTEGER" />
+        <result column="responsecode" property="responseCode" jdbcType="VARCHAR" />
+        <result column="responsemsg" property="responseMsg" jdbcType="VARCHAR" />
+        <result column="outchannel_orderId" property="outChannelOrderId" jdbcType="VARCHAR" />
+        <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" />
+
+        <result column="query_count" property="queryCount" jdbcType="INTEGER" />
+        <result column="recharge_number" property="rechargeNumber" jdbcType="VARCHAR" />
+        <result column="cost" property="cost" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, order_id, channel_id, channel_name, channel_order_id,product_id,product_name,order_type,
+         state, responsecode, responsemsg,outchannel_orderId,query_count,recharge_number,cost
+    </sql>
+
+    <insert id="insertOrder" parameterType="com.recharge.domain.ChannelOrder">
+    insert into t_channelorder(order_id,channel_id,channel_name,channel_order_id,product_id,product_name,order_type,state,responsecode,responsemsg,recharge_number,cost)
+    values(#{orderId},#{channelId},#{channelName},#{channelOrderId,jdbcType=VARCHAR},#{productId,jdbcType=VARCHAR},#{productName,jdbcType=VARCHAR},
+    #{orderType,jdbcType=INTEGER},
+      #{state},#{responseCode,jdbcType=VARCHAR},#{responseMsg,jdbcType=VARCHAR},#{rechargeNumber,jdbcType=VARCHAR},#{cost,jdbcType=DECIMAL})
+    </insert>
+
+    <update id="updateOrderState">
+      update t_channelorder SET state = #{channelOrder.state},responsemsg=#{channelOrder.responseMsg,jdbcType=VARCHAR} where channel_order_id =#{channelOrder.channelOrderId}
+        and state in
+        <foreach collection="oldStateArray" open="(" separator="," close=")" item="oldState">
+            #{oldState}
+        </foreach>
+    </update>
+
+    <update id="updateOutChannelId">
+        update t_channelorder SET outchannel_orderId = #{outChannelOrderId} where channel_order_id =#{channelOrderId}
+    </update>
+
+    <update id="updateQueryCount">
+        update t_channelorder SET query_count=query_count+1 where channel_order_id =#{channelOrderId}
+    </update>
+
+    <select id="selectByChannelOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from t_channelorder where channel_order_id=#{channelOrderId}
+    </select>
+
+    <select id="selectByOutChannelOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from t_channelorder where outchannel_orderId=#{outChannelOrderId}
+    </select>
+    <select id="selectByChannelIdStatus" resultMap="BaseResultMap">
+        select * from (
+        SELECT
+        <include refid="Base_Column_List"/> from t_channelorder where channel_id in
+        <foreach collection="channelIds" item="channelId" separator="," open="(" close=")">
+            #{channelId}
+        </foreach>
+
+        and state = #{status}
+
+        <![CDATA[
+            and order_time <=timestamp(DATE_ADD(NOW(),INTERVAL -2 MINUTE))
+            and order_time >=timestamp(DATE_ADD(NOW(),INTERVAL -1 DAY))
+        ]]>
+        order by query_count
+        ) temp
+
+        limit 0,50
+    </select>
+</mapper>

@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IRechargeOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.RechargeOrder">
+        <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+        <result column="merchant_id" property="merchantId" jdbcType="VARCHAR"/>
+        <result column="merchant_name" property="merchantName" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="sale_price" property="salePrice" jdbcType="DECIMAL"/>
+        <result column="cost" property="cost" jdbcType="DECIMAL"/>
+        <result column="pay_state" property="payState" jdbcType="INTEGER"/>
+        <result column="pay_failed_reason" property="payFailedReason" jdbcType="VARCHAR"/>
+        <result column="pay_id" property="payId" jdbcType="VARCHAR"/>
+        <result column="recharge_id" property="rechargeId" jdbcType="VARCHAR"/>
+        <result column="recharge_state" property="rechargeState" jdbcType="INTEGER"/>
+        <result column="recharge_failed_reason" property="rechargeFailedReason" jdbcType="VARCHAR"/>
+        <result column="notifyurl" property="notifyUrl" jdbcType="VARCHAR"/>
+        <result column="order_type" property="orderType" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="recharge_end_time" property="rechargeEndTime" jdbcType="TIMESTAMP"/>
+        <result column="timeout_time" property="timeOutTime" jdbcType="TIMESTAMP"/>
+        <result column="level" property="level" jdbcType="VARCHAR"/>
+        <result column="sup_id" property="supId" jdbcType="VARCHAR"/>
+        <result column="sup_name" property="supName" jdbcType="VARCHAR"/>
+        <result column="supList" property="supList" jdbcType="VARCHAR"/>
+        <result column="rechargeinfo" property="rechargeInfo" jdbcType="VARCHAR"/>
+        <result column="ext_order_id" property="extOrderId" jdbcType="VARCHAR"/>
+        <result column="exchange_traded" property="exchangeTraded" jdbcType="VARCHAR"/>
+        <result column="recharge_number" property="rechargeNumber" jdbcType="VARCHAR"/>
+
+        <result column="sell_id" property="sellId" jdbcType="VARCHAR"/>
+        <result column="sell_name" property="sellName" jdbcType="VARCHAR"/>
+        <result column="sell_name" property="sellName" jdbcType="VARCHAR"/>
+        <result column="orderSq" property="order_sq" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        order_id, merchant_id,merchant_name ,product_id, product_name, sale_price, cost, pay_state, pay_failed_reason,
+        pay_id, recharge_id, recharge_state, recharge_failed_reason, notifyurl,order_type,
+        create_time, recharge_end_time, timeout_time, level, sup_id, sup_name,
+        supList, rechargeinfo,ext_order_id,exchange_traded,recharge_number,sell_id,sell_name
+    </sql>
+
+
+    <insert id="insertOrder" parameterType="com.recharge.domain.RechargeOrder">
+        INSERT INTO t_rechargeorder (<include refid="Base_Column_List"/>)
+        VALUES
+        (#{orderId,jdbcType=VARCHAR},#{merchantId,jdbcType=VARCHAR},#{merchantName,jdbcType=VARCHAR},#{productId,jdbcType=VARCHAR},#{productName,jdbcType=VARCHAR},
+        #{salePrice,jdbcType=DECIMAL},#{cost,jdbcType=DECIMAL},#{payState,jdbcType=INTEGER},#{payFailedReason,jdbcType=VARCHAR},
+        #{payId,jdbcType=VARCHAR},#{rechargeId,jdbcType=VARCHAR},#{rechargeState,jdbcType=INTEGER},#{rechargeFailedReason,jdbcType=VARCHAR},
+        #{notifyUrl,jdbcType=VARCHAR},#{orderType,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},#{rechargeEndTime,jdbcType=TIMESTAMP},#{timeOutTime,jdbcType=TIMESTAMP},
+        #{level,jdbcType=VARCHAR},#{supId,jdbcType=VARCHAR},#{supName,jdbcType=VARCHAR},
+        #{supList,jdbcType=VARCHAR},#{rechargeInfo,jdbcType=VARCHAR},#{extOrderId,jdbcType=VARCHAR},'','',#{sellId,jdbcType=VARCHAR},#{sellName,jdbcType=VARCHAR})
+    </insert>
+    <update id="updateState">
+        UPDATE t_rechargeorder SET recharge_state = #{newState}
+        <if test="rechargeFailReason!=null and rechargeFailReason!=''">
+            ,recharge_failed_reason=#{rechargeFailReason}
+        </if>
+        where recharge_state in
+        <foreach collection="oldStateArray" open="(" separator="," close=")" item="oldState">
+            #{oldState}
+        </foreach>
+        and order_id IN
+        <foreach collection="orderIds" open="(" separator="," close=")" item="orderId">
+            #{orderId}
+        </foreach>
+
+        <if test="supUid!=null and supUid!=''">
+            and sup_id=#{supUid}
+        </if>
+    </update>
+
+    <update id="updateOrderInitInfo" parameterType="com.recharge.domain.RechargeOrder">
+        UPDATE t_rechargeorder SET product_id =#{productId} ,product_name=#{productName} , sale_price=#{salePrice,jdbcType=DECIMAL} ,
+         rechargeInfo=#{rechargeInfo},recharge_number=#{rechargeNumber} where order_id = #{orderId}
+    </update>
+
+    <update id="updateOrderSupInfo">
+        UPDATE t_rechargeorder SET sup_id =#{supId} , sup_name =#{supName} ,suplist =#{supList},cost =#{cost} where order_id = #{orderId}
+    </update>
+    <update id="updateOrderPayInfo">
+        UPDATE t_rechargeorder SET pay_id = #{payId} ,pay_state =#{payState} where order_id = #{orderId}
+    </update>
+
+    <update id="updateTimeOut">
+        UPDATE t_rechargeorder SET timeout_time =#{timeOutTime} where
+        order_id IN
+        <foreach collection="orderIds" open="(" separator="," close=")" item="orderId">
+            #{orderId}
+        </foreach>
+    </update>
+
+    <update id="updateRechargeInfo">
+    UPDATE t_rechargeorder SET recharge_end_time =sysdate(),recharge_failed_reason=#{rechargeFailedReason,jdbcType=VARCHAR},
+    recharge_id=#{rechargeId,jdbcType=VARCHAR},exchange_traded=#{exchangeTraded,jdbcType=VARCHAR}
+    WHERE order_id =#{orderId}
+    </update>
+
+    <update id="updateBuyCardInfo">
+        UPDATE t_rechargeorder SET rechargeinfo =#{rechargeInfo},sup_id=#{supId,jdbcType=VARCHAR},
+    sup_name=#{supName,jdbcType=VARCHAR},sale_price = #{salePrice,jdbcType = DECIMAL},cost =#{cost,jdbcType = DECIMAL}
+    WHERE order_id =#{orderId}
+    </update>
+
+    <update id="updateOrderChargeInfo">
+        UPDATE t_rechargeorder SET rechargeinfo =#{rechargeInfo}
+        WHERE order_id =#{orderId}
+    </update>
+
+
+    <select id="selectListByStateSupId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder
+        <![CDATA[
+        WHERE sup_id = #{supId} and recharge_state = #{orderState} AND create_time>#{startTime} and  create_time < #{endTime} and is_selected_lock=0
+        LIMIT 0,#{limitNo}
+        ]]>
+
+    </select>
+
+
+
+    <select id="selectTimeOutListByState" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder
+        <![CDATA[
+        WHERE timeout_time < sysdate()
+        AND recharge_state=#{orderState} limit 0,#{limitNo}
+        ]]>
+
+    </select>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder WHERE order_id=#{orderId}
+    </select>
+
+    <select id="selectByExtOrderId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder WHERE ext_order_id=#{extOrderId} and merchant_id=#{merchantId}
+    </select>
+
+    <select id="selectSupMonitor" resultType="java.util.Map">
+        select sup_id,sup_name,recharge_state,count(*) "number" FROM  t_rechargeorder
+        WHERE create_time > curdate()
+        GROUP BY sup_id,sup_name,recharge_state
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        <bind name="start" value="(curr-1)*pageSize"/>
+        SELECT
+        order_id, merchant_id,merchant_name ,product_id, product_name, sale_price, pay_state, pay_failed_reason,
+        pay_id, recharge_id, recharge_state,notifyurl,order_type,
+        create_time, recharge_end_time, timeout_time, level, sup_id, sup_name,
+        supList, rechargeinfo,ext_order_id,exchange_traded,recharge_number,sell_id,sell_name
+        FROM t_rechargeorder
+        WHERE 1=1
+        <if test="rechargeOrder.extOrderId!=null and rechargeOrder.extOrderId!=''">
+            and ext_order_id=#{rechargeOrder.extOrderId}
+        </if>
+
+        <if test="rechargeOrder.merchantId!=null and rechargeOrder.merchantId!=''">
+            and merchant_id=#{rechargeOrder.merchantId}
+        </if>
+
+        <if test="rechargeOrder.orderId!=null and rechargeOrder.orderId!=''">
+            and order_id=#{rechargeOrder.orderId}
+        </if>
+
+        <if test="rechargeOrder.rechargeState!=null and rechargeOrder.rechargeState!=''">
+            and recharge_state=#{rechargeOrder.rechargeState}
+        </if>
+
+        <if test="rechargeOrder.supId!=null and rechargeOrder.supId!=''">
+            and sup_id=#{rechargeOrder.supId}
+        </if>
+
+        <if test="rechargeOrder.rechargeId!=null and rechargeOrder.rechargeId!=''">
+            and recharge_id=#{rechargeOrder.rechargeId}
+        </if>
+        <if test="rechargeOrder.orderType!=null and rechargeOrder.orderType!=''">
+            and order_type=#{rechargeOrder.orderType}
+        </if>
+        <if test="rechargeOrder.rechargeNumber!=null and rechargeOrder.rechargeNumber!=''">
+            and recharge_number=#{rechargeOrder.rechargeNumber}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            <![CDATA[
+        and create_time <=#{endTime}
+        ]]>
+        </if>
+        <if test="startTime!=null and startTime!=''">
+            and create_time >=#{startTime}
+        </if>
+
+        <if test="rechargeOrder.productName!=null and rechargeOrder.productName!=''">
+            and product_name like CONCAT('%',#{rechargeOrder.productName},'%')
+        </if>
+        ORDER BY create_time desc
+        limit #{start},#{pageSize}
+    </select>
+
+    <select id="count" resultType="java.lang.Integer">
+
+        SELECT count(*) FROM t_rechargeorder
+        WHERE 1=1
+        <if test="rechargeOrder.extOrderId!=null and rechargeOrder.extOrderId!=''">
+            and ext_order_id=#{rechargeOrder.extOrderId}
+        </if>
+
+        <if test="rechargeOrder.merchantId!=null and rechargeOrder.merchantId!=''">
+            and merchant_id=#{rechargeOrder.merchantId}
+        </if>
+
+        <if test="rechargeOrder.orderId!=null and rechargeOrder.orderId!=''">
+            and order_id=#{rechargeOrder.orderId}
+        </if>
+
+        <if test="rechargeOrder.orderType!=null and rechargeOrder.orderType!=''">
+            and order_type=#{rechargeOrder.orderType}
+        </if>
+
+        <if test="rechargeOrder.rechargeState!=null and rechargeOrder.rechargeState!=''">
+            and recharge_state=#{rechargeOrder.rechargeState}
+        </if>
+
+        <if test="rechargeOrder.supId!=null and rechargeOrder.supId!=''">
+            and sup_id=#{rechargeOrder.supId}
+        </if>
+
+        <if test="rechargeOrder.rechargeId!=null and rechargeOrder.rechargeId!=''">
+            and recharge_id=#{rechargeOrder.rechargeId}
+        </if>
+
+        <if test="rechargeOrder.rechargeNumber!=null and rechargeOrder.rechargeNumber!=''">
+            and recharge_number=#{rechargeOrder.rechargeNumber}
+        </if>
+
+        <if test="endTime!=null and endTime!=''">
+            <![CDATA[
+        and create_time <=#{endTime}
+        ]]>
+        </if>
+        <if test="startTime!=null and startTime!=''">
+            and create_time >=#{startTime}
+        </if>
+
+        <if test="rechargeOrder.productName!=null and rechargeOrder.productName!=''">
+            and product_name like CONCAT('%',#{rechargeOrder.productName},'%')
+        </if>
+    </select>
+
+
+    <select id="totalSalePrice" resultType="java.math.BigDecimal">
+
+        SELECT sum(sale_price) FROM t_rechargeorder
+        WHERE 1=1
+        <if test="rechargeOrder.extOrderId!=null and rechargeOrder.extOrderId!=''">
+            and ext_order_id=#{rechargeOrder.extOrderId}
+        </if>
+
+        <if test="rechargeOrder.merchantId!=null and rechargeOrder.merchantId!=''">
+            and merchant_id=#{rechargeOrder.merchantId}
+        </if>
+
+        <if test="rechargeOrder.orderId!=null and rechargeOrder.orderId!=''">
+            and order_id=#{rechargeOrder.orderId}
+        </if>
+        <if test="rechargeOrder.orderType!=null and rechargeOrder.orderType!=''">
+            and order_type=#{rechargeOrder.orderType}
+        </if>
+        <if test="rechargeOrder.rechargeState!=null and rechargeOrder.rechargeState!=''">
+            and recharge_state=#{rechargeOrder.rechargeState}
+        </if>
+
+        <if test="rechargeOrder.supId!=null and rechargeOrder.supId!=''">
+            and sup_id=#{rechargeOrder.supId}
+        </if>
+
+        <if test="rechargeOrder.rechargeId!=null and rechargeOrder.rechargeId!=''">
+            and recharge_id=#{rechargeOrder.rechargeId}
+        </if>
+
+        <if test="rechargeOrder.rechargeNumber!=null and rechargeOrder.rechargeNumber!=''">
+            and recharge_number=#{rechargeOrder.rechargeNumber}
+        </if>
+
+        <if test="endTime!=null and endTime!=''">
+            <![CDATA[
+        and create_time <=#{endTime}
+        ]]>
+        </if>
+        <if test="startTime!=null and startTime!=''">
+            and create_time >=#{startTime}
+        </if>
+
+        <if test="rechargeOrder.productName!=null and rechargeOrder.productName!=''">
+            and product_name like CONCAT('%',#{rechargeOrder.productName},'%')
+        </if>
+    </select>
+    <select id="totalOrderInfo" resultType="java.util.Map">
+        select if(recharge_state='4','success',
+        if(recharge_state='5','fail',
+        if(recharge_state='2','toRecharge',
+        if(recharge_state='3','recharging','unkown')))) status,count(*) number
+        from t_rechargeorder
+        where create_time > #{startTime} GROUP BY recharge_state
+    </select>
+
+
+    <update id="batchLockRechargeOrder">
+        update t_rechargeorder
+        set is_selected_lock = 1
+        where order_id in
+        <foreach collection="rechargeOrders" item="rechargeOrder" index=""
+                 open="(" close=")" separator=",">
+            #{rechargeOrder.orderId}
+        </foreach>
+    </update>
+
+    <update id="batchUnLockRechargeOrder">
+        update t_rechargeorder
+        set is_selected_lock = 0
+        where order_id in
+        <foreach collection="rechargeOrders" item="rechargeOrder" index=""
+                 open="(" close=")" separator=",">
+            #{rechargeOrder.orderId}
+        </foreach>
+    </update>
+
+    <select id="selectByOrderIdList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder where order_id in
+        <foreach collection="orderIdList" item="orderId" index=""
+                 open="(" close=")" separator=",">
+            #{orderId}
+        </foreach>
+        and create_time >=#{startTime}
+    </select>
+
+    <select id="compareOrderId" resultMap="BaseResultMap">
+        select * from t_rechargeorder where 1=1
+        <![CDATA[
+        	and create_time >= "2020-07-07 20:35:00"
+        ]]>
+        <![CDATA[
+        	and create_time <= "2020-07-08 10:59:23"
+        ]]>
+        and
+        ext_order_id in
+        <foreach collection="extendOrders" item="extendOrder" index=""
+                 open="(" close=")" separator=",">
+            #{extendOrder}
+        </foreach>
+    </select>
+        <!--10006
+        10007
+        10008
+        10009
+        10010
+        10011
+        10012
+        10064
+        10065
+        88889
+        88890
+        88891
+        89002
+        89011
+        89012
+        89013-->
+<select id="queryJDcard" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from t_rechargeorder where 1=1
+    and create_time >#{maxTime} and recharge_state=2
+    and product_id in (SELECT id FROM products WHERE category_id='8' and name like '%京东E卡%')
+    limit 0,#{count}
+</select>
+
+    <select id="selectByChannleOrderId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder WHERE recharge_id=#{rechargeId}
+    </select>
+
+</mapper>

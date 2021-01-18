@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IProductMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.Product" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="enabled" property="enabled" jdbcType="BIT" />
+        <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+        <result column="category_name" property="categoryName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id, name, enabled,category_id,category_name
+    </sql>
+    <insert id="insert" parameterType="com.recharge.domain.Product">
+        insert into products (id, name, enabled
+        )
+        values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}
+        )
+    </insert>
+
+    <update id="updateDisable">
+        update products p set enabled = 0 where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updateEnable">
+        update products p set enabled = 1 where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    <update id="updateInfo" parameterType="com.recharge.domain.Product">
+        update products
+        <set >
+            <if test="name != null" >
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="enabled != null" >
+                enabled = #{enabled,jdbcType=BIT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="delByIds">
+        DELETE FROM products WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <select id="selectByName" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from products p where p.name = #{name}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" /> FROM products
+    </select>
+
+     <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" /> FROM products WHERE id=#{id}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT p.*
+        FROM products p
+        WHERE 1=1
+
+        <if test="pName!=null and pName!=''">
+            AND p.name like CONCAT('%',#{pName},'%')
+        </if>
+
+        <if test="pid!=null and pid!=''">
+            AND p.id = #{pid}
+        </if>
+
+    </select>
+
+
+    <select id="selectByProp" resultMap="BaseResultMap">
+        <bind name="start" value="(curr-1)*pageSize"/>
+        <bind name="size" value="@com.recharge.common.utils.MybatisUtils@size(productPropList)"/>
+        SELECT p.*
+        FROM products p LEFT JOIN t_category c
+        ON p.category_no=c.category_no
+        WHERE 1=1
+
+        <if test="pName!=null and pName!=''">
+            AND p.name LIKE #{pName}
+        </if>
+
+
+        <if test="productPropList !=null">
+            and p.product_no in (
+            SELECT PRODUCT_NO FROM t_product_prop_value WHERE 1=1
+            AND
+            <foreach collection="productPropList" item="productProp" open="(" separator="OR" close=")">
+                (pro_id=#{productProp.proId} AND pro_value=#{productProp.proValue})
+            </foreach>
+            GROUP BY PRODUCT_NO HAVING COUNT(PRODUCT_NO)>=#{size}
+            )
+        </if>
+        limit #{start},#{pageSize}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.MerchantBuyCardMapper">
+
+
+    <resultMap id="MerchantBuyCardPo" type="com.recharge.domain.MerchantBuyCardPo">
+        <result column="id" property="id" jdbcType="INTEGER"/>
+        <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+        <result column="card_no" property="cardNo" jdbcType="VARCHAR"/>
+        <result column="card_pwd" property="cardPwd" jdbcType="VARCHAR"/>
+        <result column="product_id" property="productId" jdbcType="VARCHAR"/>
+        <result column="product_name" property="productName" jdbcType="VARCHAR"/>
+        <result column="sup_id" property="supId" jdbcType="VARCHAR"/>
+        <result column="merchant_id" property="merchantId" jdbcType="VARCHAR"/>
+        <result column="add_time" property="addTime" jdbcType="TIMESTAMP"/>
+        <result column="expire_time" property="expireTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="fieldSql">
+        t.id
+        ,t.order_id
+		,t.card_no
+		,t.card_pwd
+		,t.product_id
+		,t.product_name
+		,t.sup_id
+		,t.merchant_id
+		,t.add_time
+    </sql>
+
+    <sql id="whereSql">
+        <if test="id != null">
+            AND t.id = #{id,jdbcType = INTEGER}
+        </if>
+
+        <if test="orderId != null and orderId != ''">
+            AND t.order_id = #{orderId,jdbcType = VARCHAR}
+        </if>
+
+        <if test="productId != null and productId != ''">
+            AND t.product_id = #{productId,jdbcType = VARCHAR}
+        </if>
+        <if test="productName != null and productName != ''">
+            AND t.product_name = #{productName,jdbcType = VARCHAR}
+        </if>
+        <if test="supId != null and supId != ''">
+            AND t.sup_id = #{supId,jdbcType = VARCHAR}
+        </if>
+        <if test="merchantId != null and merchantId != ''">
+            AND t.merchant_id = #{merchantId,jdbcType = VARCHAR}
+        </if>
+
+    </sql>
+
+    <select id="select" parameterType="Integer" resultMap="MerchantBuyCardPo">
+        SELECT
+        <include refid="fieldSql"/>
+        FROM t_merchant_buy_card t
+        WHERE t.id = #{id,jdbcType = INTEGER}
+    </select>
+
+    <select id="count" parameterType="com.recharge.domain.condition.MerchantBuyCardCondition"
+            resultType="Integer">
+        SELECT
+        count(1)
+        FROM t_merchant_buy_card t
+        <where>
+            <include refid="whereSql"/>
+        </where>
+    </select>
+
+    <select id="selectList" parameterType="com.recharge.domain.condition.MerchantBuyCardCondition"
+            resultMap="MerchantBuyCardPo">
+        SELECT
+        <include refid="fieldSql"/>
+        FROM t_merchant_buy_card t
+        <where>
+            <include refid="whereSql"/>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.recharge.domain.MerchantBuyCardPo">
+        INSERT INTO t_merchant_buy_card(
+        order_id
+        <if test="cardNo != null">
+            ,card_no
+        </if>
+        <if test="cardPwd != null">
+            ,card_pwd
+        </if>
+        <if test="productId != null">
+            ,product_id
+        </if>
+        <if test="productName != null">
+            ,product_name
+        </if>
+        <if test="supId != null">
+            ,sup_id
+        </if>
+        <if test="merchantId != null">
+            ,merchant_id
+        </if>
+        <if test="addTime != null">
+            ,add_time
+        </if>
+
+        <if test="addTime != null">
+            ,add_time
+        </if>
+
+         <if test="expireTime != null">
+            ,expire_time
+        </if>
+        )
+        VALUES(
+        #{orderId,jdbcType=VARCHAR}
+        <if test="cardNo != null">
+            ,#{cardNo,jdbcType=VARCHAR}
+        </if>
+        <if test="cardPwd != null">
+            ,#{cardPwd,jdbcType=VARCHAR}
+        </if>
+        <if test="productId != null">
+            ,#{productId,jdbcType=VARCHAR}
+        </if>
+        <if test="productName != null">
+            ,#{productName,jdbcType=VARCHAR}
+        </if>
+        <if test="supId != null">
+            ,#{supId,jdbcType=VARCHAR}
+        </if>
+        <if test="merchantId != null">
+            ,#{merchantId,jdbcType=VARCHAR}
+        </if>
+        <if test="addTime != null">
+            ,#{addTime,jdbcType=TIMESTAMP}
+        </if>
+
+        <if test="expireTime != null">
+            ,#{expireTime,jdbcType=TIMESTAMP}
+        </if>
+        )
+    </insert>
+
+    <insert id="insertByBatch" parameterType="java.util.List">
+        insert into t_merchant_buy_card (
+        order_id
+        ,card_no
+        ,card_pwd
+        ,expire_time
+        ,product_id
+        ,product_name
+        ,sup_id
+        ,merchant_id
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.orderId,jdbcType=VARCHAR},
+             #{item.cardNo,jdbcType=VARCHAR},
+             #{item.cardPwd,jdbcType=VARCHAR},
+             #{item.expireTime,jdbcType=TIMESTAMP},
+             #{item.productId,jdbcType=VARCHAR},
+             #{item.productName,jdbcType=VARCHAR},
+             #{item.supId,jdbcType=VARCHAR},
+             #{item.merchantId,jdbcType=VARCHAR}
+             )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.recharge.domain.MerchantBuyCardPo">
+        UPDATE t_merchant_buy_card t
+        <set>
+            <if test="orderId != null">
+                t.order_id = #{orderId,jdbcType = VARCHAR},
+            </if>
+            <if test="cardNo != null">
+                t.card_no = #{cardNo,jdbcType = VARCHAR},
+            </if>
+            <if test="cardPwd != null">
+                t.card_pwd = #{cardPwd,jdbcType = VARCHAR},
+            </if>
+            <if test="productId != null">
+                t.product_id = #{productId,jdbcType = VARCHAR},
+            </if>
+            <if test="productName != null">
+                t.product_name = #{productName,jdbcType = VARCHAR},
+            </if>
+            <if test="supId != null">
+                t.sup_id = #{supId,jdbcType = VARCHAR},
+            </if>
+            <if test="merchantId != null">
+                t.merchant_id = #{merchantId,jdbcType = VARCHAR},
+            </if>
+            <if test="addTime != null">
+                t.add_time = #{addTime,jdbcType = TIMESTAMP},
+            </if>
+        </set>
+        WHERE t.id= #{id,jdbcType = INTEGER}
+    </update>
+
+</mapper>

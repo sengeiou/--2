@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+                        http://www.springframework.org/schema/util
+                     http://www.springframework.org/schema/util/spring-util-3.2.xsd
+
+
+                        http://www.springframework.org/schema/util
+                        http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+    <context:property-placeholder ignore-resource-not-found="true"
+                                  system-properties-mode="OVERRIDE"
+                                  ignore-unresolvable="true"
+                                  file-encoding="utf-8"
+                                  location="classpath*:config.properties,
+								  classpath*:jdbc.properties,
+								  classpath*:dubbo.properties,
+								  file:/home/recharge/apache-tomcat-channel/app_conf/config.properties,
+								  file:/home/recharge/apache-tomcat-channel/app_conf/jdbc.properties,
+								  file:/home/recharge/apache-tomcat-channel/app_conf/dubbo.properties"/>
+
+
+    <!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制器 -->
+    <context:component-scan base-package="com"/>
+
+    <bean id="requestFactory" class="org.springframework.http.client.SimpleClientHttpRequestFactory">
+        <property name="readTimeout" value="6000"/>
+        <property name="connectTimeout" value="2000"/>
+    </bean>
+
+
+    <!-- rest template -->
+    <bean id="defaultRestTemplate" class="org.springframework.web.client.RestTemplate">
+        <constructor-arg ref="requestFactory"/>
+
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+                <bean class="org.springframework.http.converter.ResourceHttpMessageConverter"/>
+                <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+                <bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <util:map id="channelMap" value-type="com.recharge.service.recharge.AbsChannelRechargeService">
+        <entry key="100002" value-ref="zhongXiangRechargeService"/>
+        <entry key="100003" value-ref="ofpayRechargeService"/>
+        <!--<entry key="100004" value-ref="jiFenHuiRechargeService"/>-->
+
+        <entry key="100005" value-ref="ofpayLlRechargeService"></entry>
+
+        <!--Q币-->
+        <entry key="100006" value-ref="jianGuoRechargeServiceImpl"></entry>
+
+        <!--yy 币充值-->
+        <entry key="100007" value-ref="jianGuoYyRechargeServiceImpl"></entry>
+
+        <!--jiayouka -->
+        <entry key="100008" value-ref="ygRechargeServiceImpl"></entry>
+
+        <!--缴费100 话费-->
+        <entry key="100009" value-ref="jiaoFei100Service"></entry>
+
+        <!--jiaofei100 加油卡-->
+        <entry key="100010" value-ref="jiaoFeiJyk100Service"></entry>
+
+        <!--jiaofei100 视频会员-->
+        <entry key="100011" value-ref="jiaoFei100VideoService"></entry>
+        <!--jiaofei100 游戏-->
+        <entry key="100012" value-ref="jiaoFei100YxRechargeService"></entry>
+
+        <entry key="100013" value-ref="juHeJykRechargeServiceImpl"/>
+
+        <!--of 固话宽带接口-->
+        <entry key="100014" value-ref="ofpayGuHuaRechargeService"/>
+
+        <!--of 固话宽带接口-->
+        <entry key="100015" value-ref="jiaoFeiGuHua100Service"/>
+
+        <entry key="100016" value-ref="liFangGameRechargeServiceImpl"/>
+
+        <entry key="100017" value-ref="juKaService"/>
+
+        <entry key="100018" value-ref="elanHfService"/>
+
+        <entry key="100019" value-ref="zhiFuBaoRechargeService"/>
+
+        <entry key="100020" value-ref="yiMingDianXunService"/>
+
+        <entry key="100021" value-ref="yiXiaoService"/>
+
+        <!--未税-->
+        <entry key="100022" value-ref="yiXiaoService"/>
+
+        <entry key="100023" value-ref="e18HfRechargeService"/>
+
+        <entry key="100024" value-ref="haoChongRechargeService"/>
+
+        <entry key="100025" value-ref="ruiTaiRechargeService"/>
+
+        <entry key="100026" value-ref="xiangShangRechargeService"/>
+
+        <entry key="100027" value-ref="yiXiaoService"/>
+
+        <entry key="100028" value-ref="chiPeiVideoServiceImpl"/>
+
+        <entry key="100029" value-ref="moBaoVideoServiceImpl"/>
+
+        <entry key="100030" value-ref="xingChenSupServiceImpl"/>
+
+        <entry key="100031" value-ref="tianMaoServiceImpl"/>
+
+        <entry key="100032" value-ref="jiaNuoServiceImpl"/>
+
+        <entry key="100033" value-ref="dingXinJykRechargeServiceImpl"/>
+
+        <entry key="100034" value-ref="jiuZhouTuoDaRechargeServiceImpl"/>
+
+        <entry key="100035" value-ref="dingXinRechargeServiceImpl"/>
+
+        <entry key="100036" value-ref="hlHfRechargeService"/>
+
+        <entry key="100037" value-ref="fengHuangSkRechargeServiceImpl"/>
+
+        <entry key="100038" value-ref="meiTuanRechargeServiceImpl"/>
+
+        <entry key="100039" value-ref="didiCardRechargeServiceImpl"/>
+
+        <entry key="100040" value-ref="hlHfHanShuiRechargeService"/>
+
+        <entry key="100041" value-ref="tongYunRechargeServiceImpl"/>
+
+        <entry key="100042" value-ref="jiYuanTongXinRechargeServiceImpl"/>
+
+        <entry key="100043" value-ref="aiBaoRechargeService"/>
+
+        <entry key="100044" value-ref="manFanRechargeServiceImpl"/>
+
+        <entry key="100045" value-ref="manFanShouZhiRechargeServiceImpl"/>
+
+        <entry key="100047" value-ref="fuHanRechargeService"/>
+
+        <entry key="100048" value-ref="tongYunRechargeService"/>
+
+        <entry key="100049" value-ref="wanBaoRechargeServiceImpl"/>
+
+        <entry key="100050" value-ref="xuanJieRechargeService"/>
+
+        <entry key="hiSun" value-ref="hiSunBuyCardService"/>
+
+        <entry key="100051" value-ref="lianHaiRechargeService"/>
+
+        <entry key="100052" value-ref="wanBaoJykRechargeServiceImpl"/>
+
+        <entry key="100053" value-ref="liFangHfRechargeService"/>
+
+        <entry key="100054" value-ref="anChangRechargeService"/>
+
+        <entry key="100055" value-ref="zhiXinRechargeService"/>
+
+        <entry key="100056" value-ref="anChangSZRechargeService"/>
+
+        <entry key="100057" value-ref="fengHuangSZRechargeServiceImpl"/>
+
+        <entry key="100058" value-ref="ofpayJykRechargeServiceImpl"/>
+
+        <entry key="100059" value-ref="ofPayCardVideoServiceImpl"/>
+
+        <entry key="100060" value-ref="newAnChangSZRechargeService"/>
+
+        <entry key="100061" value-ref="newAnChangRechargeService"/>
+
+        <entry key="100062" value-ref="dingXinDJRechargeServiceImpl"/>
+
+        <entry key="100066" value-ref="jiuYaRechargeService"/>
+
+        <entry key="100067" value-ref="taxAnChangRechargeService"/>
+
+        <entry key="100073" value-ref="woHuLTRechargeService"/>
+
+        <entry key="100074" value-ref="ofpayHfRechargeService"/>
+
+        <entry key="100075" value-ref="lakalaRechargeService"/>
+
+        <entry key="100076" value-ref="xunYinRechargeService"/>
+
+        <entry key="100078" value-ref="XCFengHuangRechargeService"/>
+
+        <entry key="100080" value-ref="xingChenJykRechargeServiceImpl"/>
+
+        <entry key="100081" value-ref="meiKenRechargeServiceImpl"/>
+
+        <entry key="100086" value-ref="yiJunRechargeServiceImpl"/>
+
+        <entry key="100088" value-ref="xunZhongRechargeService"/>
+
+        <entry key="100089" value-ref="nuoXiangRechargeService"/>
+
+        <entry key="100090" value-ref="manFanFHRechargeSercice"/>
+
+        <entry key="100093" value-ref="yiGuRechargeServiceImpl"/>
+
+        <entry key="100094" value-ref="liFangRechargeServiceImpl"/>
+
+        <entry key="100097" value-ref="xingChenHfRechargeService"/>
+
+        <entry key="100100" value-ref="yuanFeiCGRechargeService"/>
+
+        <entry key="100101" value-ref="yuanFeiDJRechargeService"/>
+
+        <entry key="100103" value-ref="woHuNewRechargeService"/>
+
+        <entry key="100104" value-ref="boRuiRechargeService"/>
+
+        <entry key="100106" value-ref="tianMaoXTKServiceImpl"/>
+
+        <entry key="100107" value-ref="xingRongRechargeServiceImpl"/>
+
+        <entry key="100108" value-ref="qianTuRechargeServiceImpl"/>
+
+        <entry key="100109" value-ref="manFanWBRechargeService"/>
+
+        <entry key="100110" value-ref="laKaLajykRechargeServiceImpl"/>
+
+        <entry key="100111" value-ref="woHoJFRechargeService"/>
+
+        <entry key="100112" value-ref="jinFengRechargeService"/>
+
+        <entry key="100115" value-ref="xingChenQBRechargeServiceImpl"/>
+
+        <entry key="100116" value-ref="aiErBeiRechargeServiceImpl"/>
+
+        <entry key="100118" value-ref="jiangShanHfRechargeServiceImpl"/>
+
+        <entry key="100119" value-ref="yiGuJykRechargeServiceImpl"/>
+
+        <entry key="100120" value-ref="liFangJykRechargeServiceImpl"/>
+
+        <entry key="100122" value-ref="manYunJykRechargeServiceImpl"/>
+
+        <entry key="100124" value-ref="manYunNewJykRechargeServiceImpl"/>
+
+        <entry key="100126" value-ref="dingChangRechargerServiceImpl"/>
+
+        <entry key="100128" value-ref="xingYangRechargeService"/>
+
+        <entry key="100130" value-ref="yiDianServiceImpl"/>
+
+        <entry key="100131" value-ref="yaJieServiceImpl"/>
+
+        <entry key="100132" value-ref="suKaRechargeServiceImpl"/>
+
+    </util:map>
+    
+    <!-- 业务配置 -->
+    <util:map id="configMap" map-class="java.util.HashMap">
+        <entry key="xtk_channel" value="100031"/>
+        <entry key="xtk_product_name" value="天猫超市享淘卡"/>
+        <entry key="naixue_channel" value="100113"/>
+        <entry key="naixue_product_name" value="奈雪"/>
+        <entry key="JD_channel" value="100121"/>
+        <entry key="JD_product_name" value="京东"/>
+    </util:map>
+    
+</beans>

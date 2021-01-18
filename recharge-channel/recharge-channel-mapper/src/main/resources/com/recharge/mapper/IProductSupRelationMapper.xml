@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IProductSupRelationMapper">
+
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.ProductSupRelation" >
+        <id column="product_id" property="productId" jdbcType="VARCHAR" />
+        <result column="product_name" property="productName" jdbcType="VARCHAR" />
+        <result column="supuid" property="supUid" jdbcType="VARCHAR" />
+        <result column="supname" property="supName" jdbcType="VARCHAR" />
+        <result column="weight" property="weight" jdbcType="VARCHAR" />
+        <result column="level" property="level" jdbcType="INTEGER" />
+        <result column="state" property="state" jdbcType="INTEGER" />
+        <result column="cost" property="cost" jdbcType="DECIMAL" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        product_id, product_name, supuid, supname, weight, level, state,cost
+    </sql>
+
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT tsp.* FROM t_product_sup_relation tsp INNER JOIN t_channel tc
+        on tsp.supuid=tc.channel_id WHERE tsp.product_id = #{productId}
+        and tc.state='1'
+        <if test="supUid!=null and supUid!=''">
+            and tsp.supuid =#{supUid}
+        </if>
+
+        <if test="state!=null">
+            and tsp.state =#{state}
+        </if>
+
+        <if test="level!=null and level!=''">
+            and tsp.level =#{level}
+        </if>
+    </select>
+
+    <select id="selectAllByPage" resultMap="BaseResultMap" parameterType="com.recharge.common.utils.Page">
+        <bind name="size" value="@com.recharge.common.utils.MybatisUtils@size(pageParam.propValueList)"/>
+
+        SELECT <include refid="Base_Column_List"/> FROM t_product_sup_relation WHERE 1=1
+        <if test="pageParam.productSupRelation.supUid!=null and pageParam.productSupRelation.supUid!=''">
+            and supuid =#{pageParam.productSupRelation.supUid}
+        </if>
+
+        <if test="pageParam.productSupRelation.state!=null and pageParam.productSupRelation.state!=''">
+
+            and state =#{pageParam.productSupRelation.state}
+        </if>
+        <if test="pageParam.productSupRelation.level!=null and pageParam.productSupRelation.level!=''">
+            and level =#{pageParam.productSupRelation.level}
+        </if>
+
+        <if test="pageParam.propValueList!=null">
+            and product_id in (SELECT product_id FROM recharge.t_product_prop_value
+            where
+            <foreach collection="pageParam.propValueList" item="propValue" separator="or">
+                (pro_id=#{propValue.propId} and pro_value=#{propValue.propValue})
+            </foreach>
+
+            group by product_id,product_name having count(*) = #{size}
+            )
+        </if>
+
+    </select>
+    <select id="selectCost" resultMap="BaseResultMap">
+        SELECT * FROM t_product_sup_relation
+        WHERE  1=1
+        <if test="productId!=null and productId!=''">
+            and product_id=#{productId}
+        </if>
+
+        <if test="supId!=null and supId!=''">
+            and supuid =#{supId}
+        </if>
+
+        <if test="level!=null and level!=''">
+            and level =#{level}
+        </if>
+    </select>
+</mapper>
