@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <artifactId>recharge-parent</artifactId>
+        <groupId>com.recharge</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>recharge-channel</artifactId>
+    <packaging>pom</packaging>
+    <name>recharge-channel</name>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+
+        <recharge.channel.version>1.0.0-SNAPSHOT</recharge.channel.version>
+        <recharge.center.api.version>1.0.0-SNAPSHOT</recharge.center.api.version>
+        <recharge.common.version>1.0.0-SNAPSHOT</recharge.common.version>
+        <weixin-java-pay.version>3.3.0</weixin-java-pay.version>
+    </properties>
+    <modules>
+        <module>recharge-channel-web</module>
+        <module>recharge-channel-service</module>
+        <module>recharge-channel-mapper</module>
+    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.recharge</groupId>
+                <artifactId>recharge-channel-service</artifactId>
+                <version>${recharge.channel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.recharge</groupId>
+                <artifactId>recharge-channel-mapper</artifactId>
+                <version>${recharge.channel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.recharge</groupId>
+                <artifactId>recharge-center-api</artifactId>
+                <version>${recharge.center.api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.recharge</groupId>
+                <artifactId>recharge-common</artifactId>
+                <version>${recharge.common.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.github.binarywang</groupId>
+                <artifactId>weixin-java-pay</artifactId>
+                <version>${weixin-java-pay.version}</version>
+            </dependency>
+
+        </dependencies>
+        </dependencyManagement>
+
+        <!--test end-->
+    <build>
+        <finalName>recharge-channel</finalName>
+    </build>
+</project>

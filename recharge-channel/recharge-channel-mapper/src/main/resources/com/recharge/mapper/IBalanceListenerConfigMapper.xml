@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IBalanceListenerConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.BalanceListenerConfig" >
+        <id column="channel_id" property="channelId" jdbcType="VARCHAR" />
+        <result column="warn_amt" property="warnAmt" jdbcType="DECIMAL" />
+        <result column="warn_time" property="warnTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        channel_id, warn_amt ,warn_time
+    </sql>
+    <update id="updateTime">
+        UPDATE t_balance_lis_cfg set warn_time=now() WHERE  channel_id = #{channelId}
+    </update>
+
+    <select id="queryAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" /> FROM t_balance_lis_cfg WHERE
+        <![CDATA[
+          warn_time < DATE_SUB(NOW(),INTERVAL 30 MINUTE)
+        ]]>
+    </select>
+
+</mapper>

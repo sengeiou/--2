@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IChannelMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.Channel" >
+        <id column="channel_id" property="channelId" jdbcType="VARCHAR" />
+        <result column="channel_name" property="channelName" jdbcType="VARCHAR" />
+        <result column="getnum" property="getNum" jdbcType="INTEGER" />
+        <result column="state" property="state" jdbcType="INTEGER" />
+        <result column="config_info" property="configInfo" jdbcType="VARCHAR" />
+        <result column="group_id" property="groupId" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="remark2" property="remark2" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        channel_id, channel_name, getnum, config_info,state,group_id,remark,remark2
+    </sql>
+    <!--    <sql id="Base_Column_List" >-->
+    <!--        channel_id, channel_name, getnum, config_info,state,group_id,remark-->
+    <!--    </sql>-->
+
+    <select id="selectListStateOn" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from t_channel
+        where state = 1 and group_id =#{groupId}
+    </select>
+    <select id="selectByChannelId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from t_channel
+        where channel_id = #{channelId}
+    </select>
+    <update id="updateToken">
+        update t_channel set remark=#{access_token},remark2=#{refresh_token}
+        where channel_id = #{channelId}
+    </update>
+</mapper>

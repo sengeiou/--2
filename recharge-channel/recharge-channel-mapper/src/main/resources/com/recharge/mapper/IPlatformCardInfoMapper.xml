@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.recharge.mapper.IPlatformCardInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.recharge.domain.PlatformCardInfo" >
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="product_id" property="productId" jdbcType="VARCHAR" />
+        <result column="product_name" property="productName" jdbcType="VARCHAR" />
+        <result column="sup_id" property="supId" jdbcType="VARCHAR" />
+        <result column="sup_name" property="supName" jdbcType="VARCHAR" />
+        <result column="buy_time" property="buyTime" jdbcType="TIMESTAMP" />
+        <result column="card_no" property="cardNo" jdbcType="TIMESTAMP" />
+        <result column="card_pwd" property="cardPwd" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+        <result column="count" property="count" jdbcType="VARCHAR" />
+        <result column="expire_time" property="expireTime" jdbcType="TIMESTAMP" />
+        <result column="customer_id" property="customerId" jdbcType="VARCHAR" />
+        <result column="enc_version" property="encVersion" jdbcType="INTEGER" />
+        <result column="cost" property="cost" jdbcType="DECIMAL" />
+        <result column="is_selected_lock" property="isSelectedLock" jdbcType="INTEGER" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        order_id,product_id,product_name,status,sup_id,sup_name,card_no,card_pwd,id,count,expire_time,customer_id,enc_version,cost,is_selected_lock
+    </sql>
+
+    <update id="updateOrderId">
+        UPDATE t_platform_card_info set order_id =#{orderId},buy_time=now(),`status`=#{newStatus},is_selected_lock=#{isSelectedLock},count=count+1
+        where id = #{id}
+        and status =#{oldStatus} and order_id is null
+    </update>
+
+    <update id="emptyOrderId">
+        UPDATE t_platform_card_info set order_id = null,buy_time= null,status=0 where id =#{id}
+    </update>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_platform_card_info WHERE order_id=#{orderId}
+    </select>
+
+    <select id="selectStockIds" resultType="java.lang.String">
+        SELECT id from t_platform_card_info where product_id =#{actId} and status=0 limit #{number}
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM t_platform_card_info WHERE 1=1
+
+        <if test="orderId!=null and orderId!=''">
+            and order_id=#{orderId}
+        </if>
+
+        <if test="merchantId!=null and merchantId!=''">
+            and customer_id=#{merchantId}
+        </if>
+
+    </select>
+
+    <select id="queryAll" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from  t_platform_card_info where 1=1
+        <if test="platformCardInfo.customerId !=null and platformCardInfo.customerId !=''">
+            and customer_id=#{platformCardInfo.customerId}
+        </if>
+        <if test="platformCardInfo.productId !=null and platformCardInfo.productId!=''">
+            and product_id=#{platformCardInfo.productId}
+        </if>
+        <if test="platformCardInfo.status !=null and platformCardInfo.status!=''">
+            and status=#{platformCardInfo.status}
+        </if>
+        for update
+    </select>
+    
+    <!-- 新版查询库存 -->
+    <select id="queryStock" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> from  t_platform_card_info where is_selected_lock=0 
+        <if test="platformCardInfo.customerId !=null and platformCardInfo.customerId !=''">
+            and customer_id=#{platformCardInfo.customerId}
+        </if>
+        <if test="platformCardInfo.productId !=null and platformCardInfo.productId!=''">
+            and product_id=#{platformCardInfo.productId}
+        </if>
+        <if test="platformCardInfo.status !=null and platformCardInfo.status!=''">
+            and status=#{platformCardInfo.status}
+        </if>
+        limit 0,#{outNum}
+        for update
+    </select>
+    
+    <!-- 查询库存数量 -->
+    <select id="queryStokcNum">
+    	 select <include refid="Base_Column_List"/> from  t_platform_card_info where is_selected_lock=0 
+        <if test="platformCardInfo.customerId !=null and platformCardInfo.customerId !=''">
+            and customer_id=#{platformCardInfo.customerId}
+        </if>
+        <if test="platformCardInfo.productId !=null and platformCardInfo.productId!=''">
+            and product_id=#{platformCardInfo.productId}
+        </if>
+        <if test="platformCardInfo.status !=null and platformCardInfo.status!=''">
+            and status=#{platformCardInfo.status}
+        </if>
+        limit 0,#{outNum}
+        for update
+    </select>
+
+    <update id="lock">
+        update t_platform_card_info
+        set is_selected_lock = 1
+        where id in
+        <foreach collection="cond" item="item" index=""
+                 open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <update id="updateStatus">
+        update t_platform_card_info  set  status="0",order_id=NULL,buy_time=NULL where order_id=#{orderId}
+    </update>
+    
+    
+    <!-- 新版本提卡 -->
+    <update id="lockCards">
+        update t_platform_card_info
+        set is_selected_lock = 1
+        where is_selected_lock != 1 and id in
+        <foreach collection="cards" item="item" index=""
+                 open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+        
+    </update>
+    
+     <update id="unLockCards">
+        update t_platform_card_info
+        set is_selected_lock = 0
+        where is_selected_lock != 0 and id in
+        <foreach collection="cards" item="item" index=""
+                 open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </update>
+    
+    <update id="batchUpdateExtractCardOrder">
+        UPDATE t_platform_card_info set order_id =#{orderId},buy_time=now(),`status`=#{newStatus},count=count+1
+        where id in
+        <foreach collection="cards" item="item" index="" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+        and status =#{oldStatus} and (order_id='' or order_id is null or order_id=null)
+    </update>
+    
+    
+</mapper>
