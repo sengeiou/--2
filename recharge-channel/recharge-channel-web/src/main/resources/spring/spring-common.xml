@@ -259,6 +259,8 @@
 
         <entry key="100132" value-ref="suKaRechargeServiceImpl"/>
 
+        <entry key="100134" value-ref="wanBaoNewRechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->
