@@ -56,11 +56,6 @@ public class YiGuJykRechargeServiceImpl extends AbsChannelRechargeService {
             return new ProcessResult(ProcessResult.FAIL, "类型不正确");
         }
         String account = jykRechargeInfoBean.getAccount();
-//        100011866开头屏蔽
-        String substring = account.substring(0, 9);
-        if(StringUtils.equals("100011866",substring)){
-            return new ProcessResult(ProcessResult.FAIL, "此油卡号段已被屏蔽(100011866开头为区外卡)");
-        }
         String key = configJSONObject.getString("key");
         String sign = DigestUtils.md5Hex("product=" + product + "&userid=" + userid + "&price=" + price + "&num=" + num + "&account=" + account + "&spordertime=" + spordertime + "&sporderid=" + sporderid + "&key=" + key).toUpperCase();
 
