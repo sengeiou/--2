@@ -75,12 +75,13 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
     @Override
     public ProcessResult recharge(Channel channel, ChannelOrder channelOrder, RechargeOrderBean rechargeOrderBean) {
         ExtractCardRechargeInfoBean extractCardRechargeInfoBean = (ExtractCardRechargeInfoBean) rechargeOrderBean.getRechargeInfoObj(ExtractCardRechargeInfoBean.class);
+        logger.info("卡库充值参数="+JSON.toJSONString(extractCardRechargeInfoBean));
         //平台卡密
         List<PlatformCardInfo> platformCardInfos = cardStockService.outNewCards(channelOrder.getOrderId(), channelOrder.getProductId(), extractCardRechargeInfoBean.getBuyNumber(), rechargeOrderBean.getMerchantId());
         if (CollectionUtils.isEmpty(platformCardInfos)) {
             //如果库存不足
             if (rechargeOrderBean.getProductName().contains("天猫超市享淘卡")) {
-                logger.info("makeOrder_new,开始天猫享淘卡提卡....");
+                logger.info("卡库无天猫超时享淘卡,开始天猫享淘卡提卡....");
                 List<Map<String, String>> cards = TianMaoXTKbuy(rechargeOrderBean.getProductName(), channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString());
                 if (!cards.isEmpty()) {
                     insertBuyCard(cards, rechargeOrderBean);
@@ -98,7 +99,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                             try {
                                 Thread.sleep(1500);
                             } catch (InterruptedException e) {
-                                logger.error("InterruptedException", e);
+                                logger.info("InterruptedException", e);
                             }
                             ResponseOrder responseOrder = new ResponseOrder();
                             responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
@@ -110,7 +111,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                 }
             }
             if (rechargeOrderBean.getProductName().contains("奈雪")) {
-                logger.info("开始奈雪提卡.......");
+                logger.info("卡库无奈雪卡,去奈雪官方提卡.......");
                 List<Map<String, String>> cards = naiXueService.NaiXueBuyCode(channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString(), rechargeOrderBean.getProductName());
                 if (!cards.isEmpty()) {
 
@@ -141,7 +142,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                 }
             }
             if (rechargeOrderBean.getProductName().contains("京东")) {
-                logger.info("开始京东卡提卡.......");
+                logger.info("卡库无京东卡,开始京东官方提卡.......");
                 List<Map<String, String>> cards = jingDongCardService.recharge(channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString(), rechargeOrderBean.getProductName());
                 if (!cards.isEmpty()) {
                     if (StringUtils.equals(cards.get(0).get(BuyCardInfo.KEY_CARD_PWD), "ToKen校验失败")) {

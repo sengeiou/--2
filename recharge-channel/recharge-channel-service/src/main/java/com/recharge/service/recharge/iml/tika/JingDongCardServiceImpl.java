@@ -67,7 +67,7 @@ public class JingDongCardServiceImpl {
             String result = JSONObject.parseObject(responseBody).getString("result");
             String refresh_token = JSONObject.parseObject(result).getString("refresh_token");
             String access_token = JSONObject.parseObject(result).getString("access_token");
-            iChannelMapper.updateToken(access_token, refresh_token, configMap.get("jd_channel_id"));
+            iChannelMapper.updateToken(access_token, refresh_token, configMap.get("JD_channel"));
         } catch (Exception e) {
             logger.error("京东E卡官方接口: 获取token接口请求报错{}", e.getMessage());
         }
@@ -90,7 +90,7 @@ public class JingDongCardServiceImpl {
             String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 5000);
             logger.info("京东E卡官方接口,刷新token接口接收的参数:{}", JSON.toJSONString(responseBody));
             String access_token = JSONObject.parseObject(responseBody).getString("access_token");
-            int i = iChannelMapper.updateToken(access_token, refresh_token, "100121");
+            int i = iChannelMapper.updateToken(access_token, refresh_token, configMap.get("JD_channel"));
             System.out.println(responseBody);
         } catch (Exception e) {
             logger.error("京东E卡官方接口: 刷新token请求报错{}", e.getMessage());
@@ -99,6 +99,7 @@ public class JingDongCardServiceImpl {
 
     public List<Map<String, String>> recharge(String OrderId, String buynumber,String productName) {
         //2.2.1 礼品卡下单接口
+    	logger.info("京东提卡渠道号={}",configMap.get("JD_channel"));
         Channel channel = iChannelMapper.selectByChannelId(configMap.get("JD_channel"));
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         String token = channel.getRemark();
@@ -156,7 +157,7 @@ public class JingDongCardServiceImpl {
                 return cardInfos;
             }
         } catch (Exception e) {
-            logger.error("京东E卡官方接口: {}发送下单请求报错{}", thirdOrder, e.getMessage());
+            logger.info("京东E卡官方接口: {}发送下单请求报错{}", thirdOrder, e.getMessage());
             return null;
         }
     }
@@ -239,6 +240,7 @@ public class JingDongCardServiceImpl {
     public String queryJDOrderId(String orderid) {
         //2.6 反查京东订单信息接口
         Channel channel = iChannelMapper.selectByChannelId(configMap.get("JD_channel"));
+        logger.info("queryJDOrderId # 京东渠道号={},channel={}", configMap.get("JD_channel"),JSON.toJSONString(channel));
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         String token = channel.getRemark();
         String url = configJSONObject.getString("queryJDOrderIdUrl");
