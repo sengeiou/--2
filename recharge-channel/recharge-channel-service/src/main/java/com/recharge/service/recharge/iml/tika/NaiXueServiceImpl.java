@@ -99,7 +99,7 @@ public class NaiXueServiceImpl {
         }
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
-        c.add(Calendar.MONTH, 1);
+        c.add(Calendar.MONTH, 12);
         //读取配置文件，获取对应的信息
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         String url = configJSONObject.getString("rechargeUrl");
@@ -109,7 +109,7 @@ public class NaiXueServiceImpl {
         String nonce = Integer.toString(new Random(100).nextInt());
         String signature = getSignature(timestamp, nonce, partnerId, secretKey);
         String serialNo = orderId;
-        ProductRelation productRelation = iProductRelationMapper.selectByName(productName, "100121");
+        ProductRelation productRelation = iProductRelationMapper.selectByName(productName, configMap.get("naixue_channel"));
         String activeCode = productRelation.getChannelProductId();
         String validStart = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String validEnds = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
