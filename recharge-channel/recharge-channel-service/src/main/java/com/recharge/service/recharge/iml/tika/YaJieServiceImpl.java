@@ -75,7 +75,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
     @Override
     public ProcessResult recharge(Channel channel, ChannelOrder channelOrder, RechargeOrderBean rechargeOrderBean) {
         ExtractCardRechargeInfoBean extractCardRechargeInfoBean = (ExtractCardRechargeInfoBean) rechargeOrderBean.getRechargeInfoObj(ExtractCardRechargeInfoBean.class);
-        logger.info("卡库充值参数="+JSON.toJSONString(extractCardRechargeInfoBean));
+        logger.info("卡库充值参数={},RechargeOrderBean={}",JSON.toJSONString(extractCardRechargeInfoBean),JSON.toJSONString(rechargeOrderBean));
         //平台卡密
         List<PlatformCardInfo> platformCardInfos = cardStockService.outNewCards(channelOrder.getOrderId(), channelOrder.getProductId(), extractCardRechargeInfoBean.getBuyNumber(), rechargeOrderBean.getMerchantId());
         if (CollectionUtils.isEmpty(platformCardInfos)) {
@@ -302,6 +302,9 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
             }
 
             List<Map<String, String>> list = jingDongCardService.queryCardPWD(jdOrderId);
+            if(CollectionUtils.isEmpty(list)){
+            	return new ProcessResult(ProcessResult.PROCESSING, "处理中");
+            }
             RechargeOrder rechargeOrder = iRechargeOrderMapper.selectByOrderId(channelOrder.getOrderId());
 
             RechargeOrderBean rechargeOrderBean = new RechargeOrderBean();

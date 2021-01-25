@@ -99,8 +99,8 @@ public class JingDongCardServiceImpl {
 
     public List<Map<String, String>> recharge(String OrderId, String buynumber,String productName) {
         //2.2.1 礼品卡下单接口
-    	logger.info("京东提卡渠道号={}",configMap.get("JD_channel"));
         Channel channel = iChannelMapper.selectByChannelId(configMap.get("JD_channel"));
+        logger.info("recharge # 京东渠道号={},channel={}", configMap.get("JD_channel"),JSON.toJSONString(channel));
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         String token = channel.getRemark();
         String thirdOrder = OrderId;
