@@ -111,7 +111,7 @@ public class JingDongCardServiceImpl {
         DecimalFormat df = new DecimalFormat("#.00");
         String format = df.format(f);
         String sku = "[{\"price\":" + format + ", \"num\":" + buynumber + "}]";
-        String mobile = "18262227748";
+        String mobile = configJSONObject.getString("mobile");//"18262227748";
         String paymentType =configJSONObject.getString("paymentType");// "4";
         String invoiceContent = configJSONObject.getString("invoiceContent");//"44";
         String companyName = configJSONObject.getString("companyName");
