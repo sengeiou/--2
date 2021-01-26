@@ -31,7 +31,7 @@ public class MerchantCardServiceImpl {
      */
     public int insertByBatch(List<PlatformCardInfo> platformCardInfos,String orderId) {
 
-        String pass = getCustomerPassword(password + platformCardInfos.get(0).getCustomerId(),32);
+        String pass = getCustomerPassword(password + platformCardInfos.get(0).getCustomerId(),16);
 
         List<MerchantBuyCardPo> list = platformCardInfos.stream().map(item -> {
             MerchantBuyCardPo po = new MerchantBuyCardPo();
