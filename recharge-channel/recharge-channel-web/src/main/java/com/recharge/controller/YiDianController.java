@@ -6,14 +6,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.recharge.bean.ResponseOrder;
 import com.recharge.domain.BuyCardInfo;
 import com.recharge.domain.Channel;
+import com.recharge.domain.PlatformCardInfo;
 import com.recharge.domain.RechargeOrder;
 import com.recharge.domain.yidian.YiDianCallBackOrderDetail;
 import com.recharge.domain.yidian.YiDianCallBackTelephone;
 import com.recharge.mapper.IBuyCardMapper;
 import com.recharge.mapper.IRechargeOrderMapper;
 import com.recharge.service.ChannelService;
+import com.recharge.service.recharge.iml.MerchantCardServiceImpl;
 import com.recharge.utils.YiDianDESUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Administrator
@@ -36,6 +40,8 @@ import java.util.*;
 public class YiDianController {
     @Autowired
     private ChannelService channelService;
+    @Autowired
+    MerchantCardServiceImpl merchantCardServiceImpl;
 
     @Autowired
     private IRechargeOrderMapper rechargeOrderMapper;
@@ -68,7 +74,6 @@ public class YiDianController {
             String merchantId = rechargeOrder.getMerchantId();
             responseOrder.setChannelOrderId(clientorderno);
             responseOrder.setResponseCode(orderstatus);
-            channelService.callBack(channelId,responseOrder);
             JSONArray jsonArray = new JSONArray(JSON.parseArray(orderdetail));
             BuyCardInfo buyCardInfo = new BuyCardInfo();
             List<Map<String, String>> cardInfos = new ArrayList<>();
@@ -88,15 +93,33 @@ public class YiDianController {
                     cardInfos.add(infosMap);
                 }
             }
-            buyCardInfo.setCardInfo(JSONObject.toJSONString(cardInfos));
-            buyCardInfo.setStatus(BuyCardInfo.STATUS_SUCCESS);
-            buyCardInfo.setProductId(productId);
-            buyCardInfo.setProductName(productName);
-            buyCardInfo.setSupId(channelId);
-            buyCardInfo.setBuyTime(new Date());
-            buyCardInfo.setOrderId(clientorderno);
-            buyCardInfo.setMerchantId(merchantId);
-            iBuyCardMapper.insertOne(buyCardInfo);
+            List<PlatformCardInfo> platformCardInfos = cardInfos.stream().map(item -> {
+                PlatformCardInfo cardInfo = new PlatformCardInfo();
+                cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_PWD));
+                cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
+                cardInfo.setCustomerId(merchantId);
+                cardInfo.setOrderId(rechargeOrder.getOrderId());
+                cardInfo.setProductId(productId);
+                cardInfo.setProductName(productName);
+                cardInfo.setSupId(channel.getChannelId());
+                Date endDate = null;
+                try {
+                    endDate = DateUtils.parseDate(item.get(BuyCardInfo.KEY_CARD_EXP_TIME), "yyyy-MM-dd hh:mm:ss");
+                } catch (Exception e) {
+                }
+                cardInfo.setExpireTime(endDate);
+                return cardInfo;
+            }).collect(Collectors.toList());
+            merchantCardServiceImpl.insertByBatch(platformCardInfos,rechargeOrder.getOrderId());
+            channelService.callBack(channelId,responseOrder);
+        }else {
+            Object data = jsonParam.get("data");
+            JSONObject jsonObject = JSONObject.parseObject(data.toString());
+            String orderstatus = jsonObject.getString("orderstatus");
+            String clientorderno = jsonObject.getString("clientorderno");
+            responseOrder.setChannelOrderId(clientorderno);
+            responseOrder.setResponseCode(orderstatus);
+            channelService.callBack(channelId,responseOrder);
         }
         return "ok";
     }
