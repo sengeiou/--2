@@ -54,10 +54,10 @@ public class YiDianController {
     @RequestMapping(value = "/callBack", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String callBack(HttpServletRequest request) {
+        logger.info("易点提卡接口回调接收到的信息{}",request);
         Channel channel = channelService.queryChannelInfo(channelId);
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         String DESkey = configJSONObject.getString("DESkey");
-        logger.info("易点生活提卡回调信息{}",request);
         JSONObject jsonParam = this.getJSONParam(request);
         logger.info("易点生活提卡回调信息{}",jsonParam);
         int code = (int) jsonParam.get("code");
