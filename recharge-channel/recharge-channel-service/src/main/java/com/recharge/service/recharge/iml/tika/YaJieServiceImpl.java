@@ -85,7 +85,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                 List<Map<String, String>> cards = TianMaoXTKbuy(rechargeOrderBean.getProductName(), channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString());
                 if (!cards.isEmpty()) {
                     insertBuyCard(cards, rechargeOrderBean);
-                    ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel().toString());
+                    ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel());
                     if (!(productSupRelation == null)) {
                         BigDecimal cost = productSupRelation.getCost();
                         BigDecimal allCost = cost.multiply(new BigDecimal(extractCardRechargeInfoBean.getBuyNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -115,7 +115,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                 List<Map<String, String>> cards = naiXueService.NaiXueBuyCode(channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString(), rechargeOrderBean.getProductName());
                 if (!cards.isEmpty()) {
 
-                    ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel().toString());
+                    ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel());
                     if (!(productSupRelation == null)) {
                         BigDecimal cost = productSupRelation.getCost();
                         BigDecimal allCost = cost.multiply(new BigDecimal(extractCardRechargeInfoBean.getBuyNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -191,7 +191,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
 
                     return new ProcessResult(ProcessResult.FAIL, "订单失败");
                 }
-                ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel().toString());
+                ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel());
                 if (!(productSupRelation == null)) {
                     BigDecimal cost = productSupRelation.getCost();
                     BigDecimal allCost = cost.multiply(new BigDecimal(extractCardRechargeInfoBean.getBuyNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
