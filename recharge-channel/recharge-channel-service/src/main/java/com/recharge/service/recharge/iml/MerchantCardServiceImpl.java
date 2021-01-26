@@ -30,8 +30,8 @@ public class MerchantCardServiceImpl {
      * @return
      */
     public int insertByBatch(List<PlatformCardInfo> platformCardInfos,String orderId) {
-
-        String pass = getCustomerPassword(password + platformCardInfos.get(0).getCustomerId(),16);
+        String newPsd = password + platformCardInfos.get(0).getCustomerId();
+        String pass = getCustomerPassword(newPsd,32);
 
         List<MerchantBuyCardPo> list = platformCardInfos.stream().map(item -> {
             MerchantBuyCardPo po = new MerchantBuyCardPo();
@@ -54,7 +54,7 @@ public class MerchantCardServiceImpl {
         return count;
     }
 
-    private String getCustomerPassword(String md5key,Integer ln){
+    public static String getCustomerPassword(String md5key,Integer ln){
         String key = StringUtils.left(md5key,ln);
         return StringUtils.rightPad(key,ln,"0");
     }
