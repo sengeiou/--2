@@ -251,7 +251,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
         if (CollectionUtils.isEmpty(cards)) return;
         List<PlatformCardInfo> list = cards.stream().map(item -> {
             PlatformCardInfo cardInfo = new PlatformCardInfo();
-            cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_PWD));
+            cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_NO));
             cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
             cardInfo.setCustomerId(rechargeOrderBean.getMerchantId());
             cardInfo.setOrderId(rechargeOrderBean.getOrderId());

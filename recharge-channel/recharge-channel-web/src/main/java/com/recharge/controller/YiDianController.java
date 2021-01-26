@@ -95,7 +95,7 @@ public class YiDianController {
             }
             List<PlatformCardInfo> platformCardInfos = cardInfos.stream().map(item -> {
                 PlatformCardInfo cardInfo = new PlatformCardInfo();
-                cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_PWD));
+                cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_NO));
                 cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
                 cardInfo.setCustomerId(merchantId);
                 cardInfo.setOrderId(rechargeOrder.getOrderId());
