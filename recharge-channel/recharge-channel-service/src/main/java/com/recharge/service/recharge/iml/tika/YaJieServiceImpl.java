@@ -197,20 +197,6 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                     BigDecimal allCost = cost.multiply(new BigDecimal(extractCardRechargeInfoBean.getBuyNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
                     iRechargeOrderMapper.updateBuyCardInfo(rechargeOrderBean.getOrderId(), channel.getChannelId(), channel.getChannelName(), rechargeOrderBean.getSalePrice(), rechargeOrderBean.getRechargeInfo(), allCost);
                 }
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1500);
-                        } catch (InterruptedException e) {
-                            logger.error("InterruptedException", e);
-                        }
-                        ResponseOrder responseOrder = new ResponseOrder();
-                        responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
-                        responseOrder.setResponseCode("00");
-                        channelService.callBack(channel.getChannelId(), responseOrder);
-                    }
-                }).start();
 
                 return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
             }
@@ -310,10 +296,22 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
             RechargeOrderBean rechargeOrderBean = new RechargeOrderBean();
             BeanUtils.copyProperties(rechargeOrder, rechargeOrderBean);
             insertBuyCard(list, rechargeOrderBean);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        logger.error("InterruptedException", e);
+                    }
+                    ResponseOrder responseOrder = new ResponseOrder();
+                    responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
+                    responseOrder.setResponseCode("00");
+                    channelService.callBack(channel.getChannelId(), responseOrder);
+                }
+            }).start();
             return new ProcessResult(ProcessResult.SUCCESS, "卡密查询成功");
         }
-
-
         return new ProcessResult(ProcessResult.PROCESSING, "处理中");
     }
 
