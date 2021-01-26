@@ -55,7 +55,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
 
     @Override
     public ProcessResult recharge(Channel channel, ChannelOrder channelOrder, RechargeOrderBean rechargeOrderBean) {
-        ExtractCardRechargeInfoBean extractCardRechargeInfoBean = (ExtractCardRechargeInfoBean) rechargeOrderBean.getRechargeInfoObj(HuaFeiRechargeInfoBean.class);
+        ExtractCardRechargeInfoBean extractCardRechargeInfoBean = (ExtractCardRechargeInfoBean) rechargeOrderBean.getRechargeInfoObj(ExtractCardRechargeInfoBean.class);
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         JSONObject request = new JSONObject(true);
         JSONObject body = new JSONObject(true);
