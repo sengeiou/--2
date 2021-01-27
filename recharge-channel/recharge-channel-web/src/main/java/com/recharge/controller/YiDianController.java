@@ -87,9 +87,9 @@ public class YiDianController {
             int day1 = c.get(Calendar.DATE);
             c.set(Calendar.DATE, day1 - 3);
             String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
-            ChannelOrder channelOrder = channelOrderMapper.selectByChannelOrderIdByTime(clientorderno,start);
+            ChannelOrder channelOrder = channelOrderMapper.selectByChannelOrderIdOnRecent(clientorderno,start);
             if(channelOrder!=null){
-            	RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(channelOrder.getOrderId(), start);
+                RechargeOrder rechargeOrder = rechargeOrderMapper.selectByOrderIdOnRecent(channelOrder.getOrderId(), start);
 	            if (!(rechargeOrder.getRechargeState() == 4 || rechargeOrder.getRechargeState() == 5)) {
 	                String productId = rechargeOrder.getProductId();
 	                String productName = rechargeOrder.getProductName();
