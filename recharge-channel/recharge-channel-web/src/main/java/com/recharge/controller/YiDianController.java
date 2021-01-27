@@ -81,7 +81,7 @@ public class YiDianController {
             Calendar c = Calendar.getInstance();
             c.setTime(now);
             int day1 = c.get(Calendar.DATE);
-            c.set(Calendar.DATE, day1 - 1);
+            c.set(Calendar.DATE, day1 - 3);
             String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
             RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(clientorderno,start);
             String productId = rechargeOrder.getProductId();
