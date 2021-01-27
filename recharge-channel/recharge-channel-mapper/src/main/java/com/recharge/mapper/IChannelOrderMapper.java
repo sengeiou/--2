@@ -28,4 +28,7 @@ public interface IChannelOrderMapper {
     List<ChannelOrder> selectByChannelIdStatus(@Param("channelIds") String[] channelIds, @Param("status") String status);
 
     int updateQueryCount(ChannelOrder channelOrder);
+
+    ChannelOrder selectByChannelOrderIdOnRecent(@Param("channelOrderId")String channelOrderId,@Param("start")String start);
+
 }

@@ -392,11 +392,12 @@
         and create_time>#{start}
     </select>
 
-    <select id="selectByChannleOrderIdOnrecent" resultMap="BaseResultMap">
+    <select id="selectByChannleOrderIdOnRecent" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
         FROM t_rechargeorder WHERE recharge_id=#{rechargeId}
         and create_time>#{start}
     </select>
+
 
 </mapper>

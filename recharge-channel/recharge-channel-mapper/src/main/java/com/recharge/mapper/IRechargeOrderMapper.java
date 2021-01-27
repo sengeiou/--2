@@ -169,6 +169,7 @@ public interface IRechargeOrderMapper {
      */
     RechargeOrder selectByOrderIdOnRecent(@Param("orderId")String orderId,@Param("start")String start);
 
-    RechargeOrder selectByChannleOrderIdOnrecent(@Param("rechargeId")String orderId,@Param("start")String start);
+    RechargeOrder selectByChannleOrderIdOnRecent(@Param("rechargeId")String orderId,@Param("start")String start);
+
 
 }

@@ -78,4 +78,9 @@
 
         limit 0,50
     </select>
+
+    <select id="selectByChannelOrderIdOnRecent" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from t_channelorder where channel_order_id=#{channelOrderId}
+        and order_time>#{start}
+    </select>
 </mapper>
