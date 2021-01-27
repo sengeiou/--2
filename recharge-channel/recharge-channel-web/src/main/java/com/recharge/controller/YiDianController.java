@@ -71,6 +71,11 @@ public class YiDianController {
             String orderdetail = jsonObject.getString("orderdetail");
             String orderstatus = jsonObject.getString("orderstatus");
             String clientorderno = jsonObject.getString("clientorderno");
+            //更新订单信息
+            responseOrder.setChannelOrderId(clientorderno);
+            responseOrder.setResponseCode(orderstatus);
+        	channelService.callBack(channelId,responseOrder);
+            
             String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             Date now= null;
             try {
@@ -87,8 +92,6 @@ public class YiDianController {
             String productId = rechargeOrder.getProductId();
             String productName = rechargeOrder.getProductName();
             String merchantId = rechargeOrder.getMerchantId();
-            responseOrder.setChannelOrderId(clientorderno);
-            responseOrder.setResponseCode(orderstatus);
             JSONArray jsonArray = new JSONArray(JSON.parseArray(orderdetail));
             List<Map<String, String>> cardInfos = new ArrayList<>();
             List<YiDianCallBackOrderDetail> cardDTOS = null;
@@ -132,8 +135,9 @@ public class YiDianController {
             String clientorderno = jsonObject.getString("clientorderno");
             responseOrder.setChannelOrderId(clientorderno);
             responseOrder.setResponseCode(orderstatus);
+            channelService.callBack(channelId,responseOrder);
         }
-        channelService.callBack(channelId,responseOrder);
+        
         
         return "ok";
     }
