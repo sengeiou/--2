@@ -7,7 +7,6 @@ import com.hisun.crypt.mac.CryptUtilImpl;
 import com.recharge.bean.ProcessResult;
 import com.recharge.bean.ResponseOrder;
 import com.recharge.center.bean.ExtractCardRechargeInfoBean;
-import com.recharge.center.bean.HuaFeiRechargeInfoBean;
 import com.recharge.center.bean.RechargeOrderBean;
 import com.recharge.common.utils.HttpClientUtils;
 import com.recharge.domain.*;
@@ -42,13 +41,11 @@ import java.util.stream.Collectors;
 @Service
 public class YiDianServiceImpl extends AbsChannelRechargeService {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private IBuyCardMapper iBuyCardMapper;
-
     @Autowired
     MerchantCardServiceImpl merchantCardServiceImpl;
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private IBuyCardMapper iBuyCardMapper;
     @Autowired
     private IRechargeOrderMapper rechargeOrderMapper;
 
@@ -182,7 +179,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                     }
                     String orderId = channelOrder.getOrderId();
                     String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                    Date now= null;
+                    Date now = null;
                     try {
                         now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(nowdate);
                     } catch (Exception e) {
@@ -193,30 +190,32 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                     int day1 = c.get(Calendar.DATE);
                     c.set(Calendar.DATE, day1 - 3);
                     String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
-                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByOrderIdOnRecent(orderId,start);
-                    String productId = rechargeOrder.getProductId();
-                    String productName = rechargeOrder.getProductName();
-                    String merchantId = rechargeOrder.getMerchantId();
+                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByOrderIdOnRecent(orderId, start);
+                    if (!(rechargeOrder.getRechargeState() == 4 || rechargeOrder.getRechargeState() == 5)) {
+                        String productId = rechargeOrder.getProductId();
+                        String productName = rechargeOrder.getProductName();
+                        String merchantId = rechargeOrder.getMerchantId();
 
-                    List<PlatformCardInfo> platformCardInfos = cardInfos.stream().map(item -> {
-                        PlatformCardInfo cardInfo = new PlatformCardInfo();
-                        cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_NO));
-                        cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
-                        cardInfo.setCustomerId(merchantId);
-                        cardInfo.setOrderId(orderid);
-                        cardInfo.setProductId(productId);
-                        cardInfo.setProductName(productName);
-                        cardInfo.setSupId(channel.getChannelId());
-                        Date endDate = null;
-                        try {
-                            endDate = DateUtils.parseDate(item.get(BuyCardInfo.KEY_CARD_EXP_TIME), "yyyy-MM-dd hh:mm:ss");
-                        } catch (Exception e) {
-                        }
+                        List<PlatformCardInfo> platformCardInfos = cardInfos.stream().map(item -> {
+                            PlatformCardInfo cardInfo = new PlatformCardInfo();
+                            cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_NO));
+                            cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
+                            cardInfo.setCustomerId(merchantId);
+                            cardInfo.setOrderId(orderid);
+                            cardInfo.setProductId(productId);
+                            cardInfo.setProductName(productName);
+                            cardInfo.setSupId(channel.getChannelId());
+                            Date endDate = null;
+                            try {
+                                endDate = DateUtils.parseDate(item.get(BuyCardInfo.KEY_CARD_EXP_TIME), "yyyy-MM-dd hh:mm:ss");
+                            } catch (Exception e) {
+                            }
 
-                        cardInfo.setExpireTime(endDate);
-                        return cardInfo;
-                    }).collect(Collectors.toList());
-                    merchantCardServiceImpl.insertByBatch(platformCardInfos,channelOrder.getOrderId());
+                            cardInfo.setExpireTime(endDate);
+                            return cardInfo;
+                        }).collect(Collectors.toList());
+                        merchantCardServiceImpl.insertByBatch(platformCardInfos, channelOrder.getOrderId());
+                    }
                     return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
                 } else if (StringUtils.equals("4", orderstatus) || StringUtils.equals("5", orderstatus)) {
                     return new ProcessResult(ProcessResult.FAIL, "订单失败");
