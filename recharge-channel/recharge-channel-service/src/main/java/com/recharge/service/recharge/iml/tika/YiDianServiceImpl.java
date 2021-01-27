@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,7 +180,20 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                             cardInfos.add(infosMap);
                         }
                     }
-                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderId(orderid);
+                    String channelId = channelOrder.getChannelId();
+                    String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                    Date now= null;
+                    try {
+                        now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(nowdate);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(now);
+                    int day1 = c.get(Calendar.DATE);
+                    c.set(Calendar.DATE, day1 - 3);
+                    String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
+                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByOrderId(channelId,start);
                     String productId = rechargeOrder.getProductId();
                     String productName = rechargeOrder.getProductName();
                     String merchantId = rechargeOrder.getMerchantId();
