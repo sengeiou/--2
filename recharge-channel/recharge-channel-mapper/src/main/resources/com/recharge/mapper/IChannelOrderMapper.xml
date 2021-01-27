@@ -55,6 +55,10 @@
     <select id="selectByChannelOrderId" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/> from t_channelorder where channel_order_id=#{channelOrderId}
     </select>
+    
+     <select id="selectByChannelOrderIdByTime" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> from t_channelorder where channel_order_id=#{channelOrderId} and order_time>=#{start}
+    </select>
 
     <select id="selectByOutChannelOrderId" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/> from t_channelorder where outchannel_orderId=#{outChannelOrderId}
