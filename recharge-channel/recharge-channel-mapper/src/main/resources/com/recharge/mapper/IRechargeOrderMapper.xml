@@ -385,7 +385,7 @@
     limit 0,#{count}
 </select>
 
-    <select id="selectByChannleOrderId" resultMap="BaseResultMap">
+    <select id="selectByOrderIdOnRecent" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
         FROM t_rechargeorder WHERE order_id=#{orderId}

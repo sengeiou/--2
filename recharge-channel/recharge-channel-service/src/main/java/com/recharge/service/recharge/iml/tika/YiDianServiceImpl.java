@@ -193,7 +193,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                     int day1 = c.get(Calendar.DATE);
                     c.set(Calendar.DATE, day1 - 3);
                     String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
-                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderId(orderId,start);
+                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByOrderIdOnRecent(orderId,start);
                     String productId = rechargeOrder.getProductId();
                     String productName = rechargeOrder.getProductName();
                     String merchantId = rechargeOrder.getMerchantId();
