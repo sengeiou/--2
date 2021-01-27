@@ -180,7 +180,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                             cardInfos.add(infosMap);
                         }
                     }
-                    String channelId = channelOrder.getChannelId();
+                    String orderId = channelOrder.getOrderId();
                     String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     Date now= null;
                     try {
@@ -193,7 +193,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                     int day1 = c.get(Calendar.DATE);
                     c.set(Calendar.DATE, day1 - 3);
                     String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
-                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByOrderId(channelId,start);
+                    RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderId(orderId,start);
                     String productId = rechargeOrder.getProductId();
                     String productName = rechargeOrder.getProductName();
                     String merchantId = rechargeOrder.getMerchantId();

@@ -388,7 +388,8 @@
     <select id="selectByChannleOrderId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM t_rechargeorder WHERE recharge_id=#{rechargeId}
+        FROM t_rechargeorder WHERE order_id=#{orderId}
+        and create_time>#{start}
     </select>
 
     <select id="selectByChannleOrderIdOnrecent" resultMap="BaseResultMap">
