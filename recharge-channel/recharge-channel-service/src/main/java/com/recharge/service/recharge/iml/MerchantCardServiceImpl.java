@@ -7,6 +7,8 @@ import com.recharge.domain.MerchantBuyCardPo;
 import com.recharge.domain.PlatformCardInfo;
 import com.recharge.mapper.MerchantBuyCardMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,9 @@ public class MerchantCardServiceImpl {
 
     @Value("${card.descKey}")
     private String password;
-
+    
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    
     /**
      * 批量插入已购买卡密信息
      *
@@ -32,7 +36,7 @@ public class MerchantCardServiceImpl {
     public int insertByBatch(List<PlatformCardInfo> platformCardInfos,String orderId) {
         String newPsd = password + platformCardInfos.get(0).getCustomerId();
         String pass = getCustomerPassword(newPsd,32);
-
+        logger.info("插卡使用的password+客户id ={},截取32位={}",newPsd,pass);
         List<MerchantBuyCardPo> list = platformCardInfos.stream().map(item -> {
             MerchantBuyCardPo po = new MerchantBuyCardPo();
             po.setOrderId(orderId);
