@@ -4,13 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.recharge.bean.ResponseOrder;
-import com.recharge.domain.BuyCardInfo;
-import com.recharge.domain.Channel;
-import com.recharge.domain.PlatformCardInfo;
-import com.recharge.domain.RechargeOrder;
+import com.recharge.domain.*;
 import com.recharge.domain.yidian.YiDianCallBackOrderDetail;
 import com.recharge.domain.yidian.YiDianCallBackTelephone;
 import com.recharge.mapper.IBuyCardMapper;
+import com.recharge.mapper.IChannelMapper;
+import com.recharge.mapper.IChannelOrderMapper;
 import com.recharge.mapper.IRechargeOrderMapper;
 import com.recharge.service.ChannelService;
 import com.recharge.service.recharge.iml.MerchantCardServiceImpl;
@@ -49,6 +48,9 @@ public class YiDianController {
     @Autowired
     private IRechargeOrderMapper rechargeOrderMapper;
     @Autowired
+    private IChannelOrderMapper channelorde;
+
+    @Autowired
     private IBuyCardMapper iBuyCardMapper;
     private String channelId = "100130";
 
@@ -66,16 +68,15 @@ public class YiDianController {
         int code = (int) jsonParam.get("code");
         String s = Integer.toString(code);
         ResponseOrder responseOrder = new ResponseOrder();
+        String orderstatus;
+        String clientorderno;
         if (StringUtils.equals("0", s)) {
             Object data = jsonParam.get("data");
             JSONObject jsonObject = JSONObject.parseObject(data.toString());
             String orderdetail = jsonObject.getString("orderdetail");
-            String orderstatus = jsonObject.getString("orderstatus");
-            String clientorderno = jsonObject.getString("clientorderno");
-            //更新订单信息
-            responseOrder.setChannelOrderId(clientorderno);
-            responseOrder.setResponseCode(orderstatus);
-            channelService.callBack(channelId, responseOrder);
+            orderstatus = jsonObject.getString("orderstatus");
+            clientorderno = jsonObject.getString("clientorderno");
+
 
             String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             Date now = null;
@@ -89,7 +90,8 @@ public class YiDianController {
             int day1 = c.get(Calendar.DATE);
             c.set(Calendar.DATE, day1 - 3);
             String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
-            RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(clientorderno, start);
+            ChannelOrder channelOrder = channelorde.selectByChannelOrderId(clientorderno);
+            RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(channelOrder.getOrderId(), start);
             if (!(rechargeOrder.getRechargeState() == 4 || rechargeOrder.getRechargeState() == 5)) {
                 String productId = rechargeOrder.getProductId();
                 String productName = rechargeOrder.getProductName();
@@ -134,12 +136,13 @@ public class YiDianController {
         } else {
             Object data = jsonParam.get("data");
             JSONObject jsonObject = JSONObject.parseObject(data.toString());
-            String orderstatus = jsonObject.getString("orderstatus");
-            String clientorderno = jsonObject.getString("clientorderno");
-            responseOrder.setChannelOrderId(clientorderno);
-            responseOrder.setResponseCode(orderstatus);
-            channelService.callBack(channelId, responseOrder);
+            orderstatus = jsonObject.getString("orderstatus");
+            clientorderno = jsonObject.getString("clientorderno");
         }
+        //更新订单信息
+        responseOrder.setChannelOrderId(clientorderno);
+        responseOrder.setResponseCode(orderstatus);
+        channelService.callBack(channelId, responseOrder);
         try {
             res.setContentType("text/html;charset=UTF-8");
             PrintWriter out = res.getWriter();
