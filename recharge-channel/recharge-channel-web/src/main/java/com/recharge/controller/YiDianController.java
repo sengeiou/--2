@@ -90,7 +90,6 @@ public class YiDianController {
             responseOrder.setChannelOrderId(clientorderno);
             responseOrder.setResponseCode(orderstatus);
             JSONArray jsonArray = new JSONArray(JSON.parseArray(orderdetail));
-            BuyCardInfo buyCardInfo = new BuyCardInfo();
             List<Map<String, String>> cardInfos = new ArrayList<>();
             List<YiDianCallBackOrderDetail> cardDTOS = null;
             cardDTOS = JSONObject.parseArray(jsonArray.toJSONString(), YiDianCallBackOrderDetail.class);
@@ -126,7 +125,6 @@ public class YiDianController {
                 return cardInfo;
             }).collect(Collectors.toList());
             merchantCardServiceImpl.insertByBatch(platformCardInfos,rechargeOrder.getOrderId());
-            channelService.callBack(channelId,responseOrder);
         }else {
             Object data = jsonParam.get("data");
             JSONObject jsonObject = JSONObject.parseObject(data.toString());
@@ -134,8 +132,9 @@ public class YiDianController {
             String clientorderno = jsonObject.getString("clientorderno");
             responseOrder.setChannelOrderId(clientorderno);
             responseOrder.setResponseCode(orderstatus);
-            channelService.callBack(channelId,responseOrder);
         }
+        channelService.callBack(channelId,responseOrder);
+        
         return "ok";
     }
 
