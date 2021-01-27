@@ -48,10 +48,8 @@ public class YiDianController {
     @Autowired
     private IRechargeOrderMapper rechargeOrderMapper;
     @Autowired
-    private IChannelOrderMapper channelorde;
-
-    @Autowired
-    private IBuyCardMapper iBuyCardMapper;
+    private IChannelOrderMapper channelOrderMapper;
+    
     private String channelId = "100130";
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -77,7 +75,6 @@ public class YiDianController {
             orderstatus = jsonObject.getString("orderstatus");
             clientorderno = jsonObject.getString("clientorderno");
 
-
             String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             Date now = null;
             try {
@@ -90,48 +87,53 @@ public class YiDianController {
             int day1 = c.get(Calendar.DATE);
             c.set(Calendar.DATE, day1 - 3);
             String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
-            ChannelOrder channelOrder = channelorde.selectByChannelOrderId(clientorderno);
-            RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(channelOrder.getOrderId(), start);
-            if (!(rechargeOrder.getRechargeState() == 4 || rechargeOrder.getRechargeState() == 5)) {
-                String productId = rechargeOrder.getProductId();
-                String productName = rechargeOrder.getProductName();
-                String merchantId = rechargeOrder.getMerchantId();
-                JSONArray jsonArray = new JSONArray(JSON.parseArray(orderdetail));
-                List<Map<String, String>> cardInfos = new ArrayList<>();
-                List<YiDianCallBackOrderDetail> cardDTOS = null;
-                cardDTOS = JSONObject.parseArray(jsonArray.toJSONString(), YiDianCallBackOrderDetail.class);
-                for (YiDianCallBackOrderDetail cardDTO : cardDTOS) {
-                    Object codedetail = cardDTO.getCodedetail();
-                    String telephone = JSONObject.parseObject(JSONObject.toJSONString(codedetail)).getString(configJSONObject.getString("telephone"));
-                    JSONArray telephoneArray = new JSONArray(JSON.parseArray(telephone));
-                    List<YiDianCallBackTelephone> cards = null;
-                    cards = JSONObject.parseArray(telephoneArray.toJSONString(), YiDianCallBackTelephone.class);
-                    for (YiDianCallBackTelephone card : cards) {
-                        Map<String, String> infosMap = new HashMap<>();
-                        infosMap.put(BuyCardInfo.KEY_CARD_NO, YiDianDESUtils.decrypt(card.getBarcode(), DESkey));
-                        infosMap.put(BuyCardInfo.KEY_CARD_PWD, YiDianDESUtils.decrypt(card.getBarpwd(), DESkey));
-                        infosMap.put(BuyCardInfo.KEY_CARD_EXP_TIME, card.getDuedate());
-                        cardInfos.add(infosMap);
-                    }
-                }
-                List<PlatformCardInfo> platformCardInfos = cardInfos.stream().map(item -> {
-                    PlatformCardInfo cardInfo = new PlatformCardInfo();
-                    cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_NO));
-                    cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
-                    cardInfo.setCustomerId(merchantId);
-                    cardInfo.setOrderId(rechargeOrder.getOrderId());
-                    cardInfo.setProductId(productId);
-                    cardInfo.setProductName(productName);
-                    cardInfo.setSupId(channel.getChannelId());
-                    Date endDate = null;
-                    try {
-                        endDate = DateUtils.parseDate(item.get(BuyCardInfo.KEY_CARD_EXP_TIME), "yyyy-MM-dd hh:mm:ss");
-                    } catch (Exception e) {
-                    }
-                    cardInfo.setExpireTime(endDate);
-                    return cardInfo;
-                }).collect(Collectors.toList());
-                merchantCardServiceImpl.insertByBatch(platformCardInfos, rechargeOrder.getOrderId());
+            ChannelOrder channelOrder = channelOrderMapper.selectByChannelOrderIdByTime(clientorderno,start);
+            if(channelOrder!=null){
+            	RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(channelOrder.getOrderId(), start);
+	            if (!(rechargeOrder.getRechargeState() == 4 || rechargeOrder.getRechargeState() == 5)) {
+	                String productId = rechargeOrder.getProductId();
+	                String productName = rechargeOrder.getProductName();
+	                String merchantId = rechargeOrder.getMerchantId();
+	                JSONArray jsonArray = new JSONArray(JSON.parseArray(orderdetail));
+	                List<Map<String, String>> cardInfos = new ArrayList<>();
+	                List<YiDianCallBackOrderDetail> cardDTOS = null;
+	                cardDTOS = JSONObject.parseArray(jsonArray.toJSONString(), YiDianCallBackOrderDetail.class);
+	                for (YiDianCallBackOrderDetail cardDTO : cardDTOS) {
+	                    Object codedetail = cardDTO.getCodedetail();
+	                    String telephone = JSONObject.parseObject(JSONObject.toJSONString(codedetail)).getString(configJSONObject.getString("telephone"));
+	                    JSONArray telephoneArray = new JSONArray(JSON.parseArray(telephone));
+	                    List<YiDianCallBackTelephone> cards = null;
+	                    cards = JSONObject.parseArray(telephoneArray.toJSONString(), YiDianCallBackTelephone.class);
+	                    for (YiDianCallBackTelephone card : cards) {
+	                        Map<String, String> infosMap = new HashMap<>();
+	                        infosMap.put(BuyCardInfo.KEY_CARD_NO, YiDianDESUtils.decrypt(card.getBarcode(), DESkey));
+	                        infosMap.put(BuyCardInfo.KEY_CARD_PWD, YiDianDESUtils.decrypt(card.getBarpwd(), DESkey));
+	                        infosMap.put(BuyCardInfo.KEY_CARD_EXP_TIME, card.getDuedate());
+	                        cardInfos.add(infosMap);
+	                    }
+	                }
+	                List<PlatformCardInfo> platformCardInfos = cardInfos.stream().map(item -> {
+	                    PlatformCardInfo cardInfo = new PlatformCardInfo();
+	                    cardInfo.setCardNo(item.get(BuyCardInfo.KEY_CARD_NO));
+	                    cardInfo.setCardPwd(item.get(BuyCardInfo.KEY_CARD_PWD));
+	                    cardInfo.setCustomerId(merchantId);
+	                    cardInfo.setOrderId(rechargeOrder.getOrderId());
+	                    cardInfo.setProductId(productId);
+	                    cardInfo.setProductName(productName);
+	                    cardInfo.setSupId(channel.getChannelId());
+	                    Date endDate = null;
+	                    try {
+	                        endDate = DateUtils.parseDate(item.get(BuyCardInfo.KEY_CARD_EXP_TIME), "yyyy-MM-dd hh:mm:ss");
+	                    } catch (Exception e) {
+	                    }
+	                    cardInfo.setExpireTime(endDate);
+	                    return cardInfo;
+	                }).collect(Collectors.toList());
+	                merchantCardServiceImpl.insertByBatch(platformCardInfos, rechargeOrder.getOrderId());
+	            }
+            }else{
+            	logger.info("渠道订单号{}不存在..."+clientorderno);
+            	return ;
             }
         } else {
             Object data = jsonParam.get("data");
