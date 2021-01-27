@@ -391,4 +391,11 @@
         FROM t_rechargeorder WHERE recharge_id=#{rechargeId}
     </select>
 
+    <select id="selectByChannleOrderIdOnrecent" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_rechargeorder WHERE recharge_id=#{rechargeId}
+        and create_time>#{start}
+    </select>
+
 </mapper>

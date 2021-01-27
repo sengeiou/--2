@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,7 +71,19 @@ public class YiDianController {
             String orderdetail = jsonObject.getString("orderdetail");
             String orderstatus = jsonObject.getString("orderstatus");
             String clientorderno = jsonObject.getString("clientorderno");
-            RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderId(clientorderno);
+            String nowdate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            Date now= null;
+            try {
+                now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(nowdate);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Calendar c = Calendar.getInstance();
+            c.setTime(now);
+            int day1 = c.get(Calendar.DATE);
+            c.set(Calendar.DATE, day1 - 1);
+            String start = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(c.getTime());
+            RechargeOrder rechargeOrder = rechargeOrderMapper.selectByChannleOrderIdOnrecent(clientorderno,start);
             String productId = rechargeOrder.getProductId();
             String productName = rechargeOrder.getProductName();
             String merchantId = rechargeOrder.getMerchantId();
@@ -82,7 +96,7 @@ public class YiDianController {
             cardDTOS = JSONObject.parseArray(jsonArray.toJSONString(), YiDianCallBackOrderDetail.class);
             for (YiDianCallBackOrderDetail cardDTO : cardDTOS) {
                 Object codedetail = cardDTO.getCodedetail();
-                String telephone = JSONObject.parseObject(JSONObject.toJSONString(codedetail)).getString(jsonObject.getString("telephone"));
+                String telephone = JSONObject.parseObject(JSONObject.toJSONString(codedetail)).getString(configJSONObject.getString("telephone"));
                 JSONArray telephoneArray = new JSONArray(JSON.parseArray(telephone));
                 List<YiDianCallBackTelephone> cards = null;
                 cards = JSONObject.parseArray(telephoneArray.toJSONString(), YiDianCallBackTelephone.class);
