@@ -129,7 +129,7 @@ public class YiDianController {
 	                    cardInfo.setExpireTime(endDate);
 	                    return cardInfo;
 	                }).collect(Collectors.toList());
-	                merchantCardServiceImpl.insertByBatch(platformCardInfos, rechargeOrder.getOrderId());
+	                merchantCardServiceImpl.insertByBatch(platformCardInfos, rechargeOrder.getOrderId(),rechargeOrder.getMerchantId());
 	            }
             }else{
             	logger.info("渠道订单号{}不存在..."+clientorderno);

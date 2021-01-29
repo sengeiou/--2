@@ -7,6 +7,7 @@ import com.recharge.domain.MerchantBuyCardPo;
 import com.recharge.domain.PlatformCardInfo;
 import com.recharge.mapper.MerchantBuyCardMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,8 @@ public class MerchantCardServiceImpl {
      * @param platformCardInfos
      * @return
      */
-    public int insertByBatch(List<PlatformCardInfo> platformCardInfos,String orderId) {
-        String newPsd = password + platformCardInfos.get(0).getCustomerId();
+    public int insertByBatch(List<PlatformCardInfo> platformCardInfos,String orderId,String merchantId) {
+        String newPsd = password + merchantId;
         String pass = getCustomerPassword(newPsd,32);
         logger.info("插卡使用的password+客户id ={},截取32位={}",newPsd,pass);
         List<MerchantBuyCardPo> list = platformCardInfos.stream().map(item -> {
@@ -49,7 +50,7 @@ public class MerchantCardServiceImpl {
             po.setProductId(item.getProductId());
             po.setProductName(item.getProductName());
             po.setSupId(item.getSupId());
-            po.setMerchantId(item.getCustomerId());
+            po.setMerchantId(merchantId);
             po.setExpireTime(item.getExpireTime());
             return po;
         }).collect(Collectors.toList());
@@ -61,5 +62,14 @@ public class MerchantCardServiceImpl {
     public static String getCustomerPassword(String md5key,Integer ln){
         String key = StringUtils.left(md5key,ln);
         return StringUtils.rightPad(key,ln,"0");
+    }
+
+    @Test
+    void test(){
+        String newPsd = "giLuT2D19XtWGt4r" + "M13903";
+        String pass = getCustomerPassword(newPsd,32);
+        String no = DesUtil.encrypt("3100580205727331474", pass);
+        String pwd = DesUtil.encrypt("5WH3UPFUNWEFUT3V", pass);
+        System.out.println("z");
     }
 }

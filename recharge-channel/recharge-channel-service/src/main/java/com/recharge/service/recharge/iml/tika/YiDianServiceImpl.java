@@ -15,6 +15,7 @@ import com.recharge.domain.yidian.YiDianCallBackOrderDetail;
 import com.recharge.domain.yidian.YiDianCallBackTelephone;
 import com.recharge.domain.yidian.YiDianIssueinfo;
 import com.recharge.mapper.IBuyCardMapper;
+import com.recharge.mapper.IProductSupRelationMapper;
 import com.recharge.mapper.IRechargeOrderMapper;
 import com.recharge.service.recharge.AbsChannelRechargeService;
 import com.recharge.service.recharge.iml.MerchantCardServiceImpl;
@@ -46,6 +47,12 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private IBuyCardMapper iBuyCardMapper;
+    @Autowired
+    private IProductSupRelationMapper iProductSupRelationMapper;
+    @Autowired
+    protected IRechargeOrderMapper iRechargeOrderMapper;
+    private String channelId = "100130";
+    private String channelName = "100130";
     @Autowired
     private IRechargeOrderMapper rechargeOrderMapper;
 
@@ -214,7 +221,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
                             cardInfo.setExpireTime(endDate);
                             return cardInfo;
                         }).collect(Collectors.toList());
-                        merchantCardServiceImpl.insertByBatch(platformCardInfos, channelOrder.getOrderId());
+                        merchantCardServiceImpl.insertByBatch(platformCardInfos, channelOrder.getOrderId(),rechargeOrder.getMerchantId());
                     }
                     return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
                 } else if (StringUtils.equals("4", orderstatus) || StringUtils.equals("5", orderstatus)) {

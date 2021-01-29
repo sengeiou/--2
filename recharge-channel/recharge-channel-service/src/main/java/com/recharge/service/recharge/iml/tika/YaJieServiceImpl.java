@@ -241,7 +241,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                 }
             }).start();
 
-            merchantCardServiceImpl.insertByBatch(platformCardInfos,rechargeOrderBean.getOrderId());
+            merchantCardServiceImpl.insertByBatch(platformCardInfos,rechargeOrderBean.getOrderId(),rechargeOrderBean.getMerchantId());
             return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
         }
 
@@ -275,7 +275,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
 
             return cardInfo;
         }).collect(Collectors.toList());
-        merchantCardServiceImpl.insertByBatch(list,rechargeOrderBean.getOrderId());
+        merchantCardServiceImpl.insertByBatch(list,rechargeOrderBean.getOrderId(),rechargeOrderBean.getMerchantId());
     }
 
     @Override
