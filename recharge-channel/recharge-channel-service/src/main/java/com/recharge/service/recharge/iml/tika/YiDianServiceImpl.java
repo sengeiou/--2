@@ -52,7 +52,7 @@ public class YiDianServiceImpl extends AbsChannelRechargeService {
     @Autowired
     protected IRechargeOrderMapper iRechargeOrderMapper;
     private String channelId = "100130";
-    private String channelName = "100130";
+    private String channelName = "yidian";
     @Autowired
     private IRechargeOrderMapper rechargeOrderMapper;
 
