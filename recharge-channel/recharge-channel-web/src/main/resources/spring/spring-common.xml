@@ -261,6 +261,8 @@
 
         <entry key="100134" value-ref="wanBaoNewRechargeServiceImpl"/>
 
+        <entry key="100135" value-ref="wanBao2021RechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->
