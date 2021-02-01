@@ -27,7 +27,7 @@ import java.math.BigDecimal;
  * @create 2021/2/1 16:09
  */
 @Service
-public class WanBao2021RechargeServiceImpl extends AbsChannelRechargeService {
+public class WanBaoGuanAiTongRechargeServiceImpl extends AbsChannelRechargeService {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -73,9 +73,9 @@ public class WanBao2021RechargeServiceImpl extends AbsChannelRechargeService {
                     "&ispname=" + "" +
                     "&source=" + source +
                     "&verifystring=" + verifystring;
-            logger.info("WanBao2021 send recharge request params:{}", requestUrl);
+            logger.info("WanBaoGuanAiTong send recharge request params:{}", requestUrl);
             String responseBody = HttpClientUtils.invokeGetHttp(requestUrl, "utf-8", 5000);
-            logger.info("WanBao2021 send recharge response :{}", responseBody);
+            logger.info("WanBaoGuanAiTong send recharge response :{}", responseBody);
 
             Document document = DocumentHelper.parseText(responseBody);
             Element root = document.getRootElement();
@@ -116,9 +116,9 @@ public class WanBao2021RechargeServiceImpl extends AbsChannelRechargeService {
                     "&returntype=" + returntype +
                     "&orderid=" + orderid +
                     "&verifystring=" + verifystring;
-            logger.info("WanBao2021 send query request params:{}", requestUrl);
+            logger.info("WanBaoGuanAiTong send query request params:{}", requestUrl);
             String responseBody = HttpClientUtils.invokeGetHttp(requestUrl, "utf-8", 5000);
-            logger.info("WanBao2021 send query response :{}", responseBody);
+            logger.info("WanBaoGuanAiTong send query response :{}", responseBody);
 
             Document document = DocumentHelper.parseText(responseBody);
             Element root = document.getRootElement();
@@ -167,9 +167,9 @@ public class WanBao2021RechargeServiceImpl extends AbsChannelRechargeService {
         try {
             String requestUrl = queryBalanceUrl + "?agentid=" + userId +
                     "&verifystring=" + verifystring;
-            logger.info("WanBao2021 send queryBalance request params:{}", requestUrl);
+            logger.info("WanBaoGuanAiTong send queryBalance request params:{}", requestUrl);
             String responseBody = HttpClientUtils.invokeGetHttp(requestUrl, "utf-8", 5000);
-            logger.info("WanBao2021 send queryBalance response :{}", responseBody);
+            logger.info("WanBaoGuanAiTong send queryBalance response :{}", responseBody);
             Document document = DocumentHelper.parseText(responseBody);
             Element root = document.getRootElement();
             String resultno = root.elementText("resultno");
@@ -186,10 +186,10 @@ public class WanBao2021RechargeServiceImpl extends AbsChannelRechargeService {
 
     @Test
     void test(){
-        WanBao2021RechargeServiceImpl wanBao2021RechargeService = new WanBao2021RechargeServiceImpl();
+        WanBaoGuanAiTongRechargeServiceImpl wanBaoGuanAiTongRechargeService = new WanBaoGuanAiTongRechargeServiceImpl();
         Channel channel = new Channel();
         ChannelOrder channelOrder = new ChannelOrder();
         channel.setConfigInfo("{\"url\":\"http://47.103.120.138:8107/MainServiceBusiness/SendPhoneChargeInfo\",\"userId\":\"10113\",\"key\":\"949a4fc414af9142b52d03a4f4b50a63\",\"queryUrl\":\"http://47.103.120.138:8107/MainServiceBusiness/GetOrderInfo\",\"queryBalanceUrl\":\"http://47.103.120.138:8107/MainServiceBusiness/GetAgentInfo\"}");
-        BigDecimal bigDecimal = wanBao2021RechargeService.balanceQuery(channel);
+        BigDecimal bigDecimal = wanBaoGuanAiTongRechargeService.balanceQuery(channel);
     }
 }

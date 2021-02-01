@@ -261,7 +261,7 @@
 
         <entry key="100134" value-ref="wanBaoNewRechargeServiceImpl"/>
 
-        <entry key="100135" value-ref="wanBao2021RechargeServiceImpl"/>
+        <entry key="100135" value-ref="wanBaoGuanAiTongRechargeServiceImpl"/>
 
     </util:map>
     

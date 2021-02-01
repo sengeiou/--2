@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @create 2021/2/1 16:16
  */
 @Controller
-@RequestMapping("/wanBao2021")
-public class WanBao2021RechargeController {
+@RequestMapping("/wanBaoGuanAiTong")
+public class WanBaoGuanAiTongController {
     @Autowired
     private ChannelService channelService;
 
