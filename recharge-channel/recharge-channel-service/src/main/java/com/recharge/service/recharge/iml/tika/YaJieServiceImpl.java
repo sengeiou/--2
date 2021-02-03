@@ -80,10 +80,10 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
         if (CollectionUtils.isEmpty(platformCardInfos)) {
             //如果库存不足
             if (rechargeOrderBean.getProductName().contains("天猫超市享淘卡")) {
-                logger.info("卡库无天猫超时享淘卡,开始天猫享淘卡提卡....");
+                logger.info("卡库无天猫超市享淘卡,开始天猫享淘卡提卡....");
                 Boolean buy = TianMaoXTKbuy(rechargeOrderBean.getProductName(), channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString());
                 if (buy) {
-                    logger.info("卡库无天猫超时享淘卡,开始天猫享淘卡提卡....");
+                    logger.info("天猫超市享淘卡官方下单成功");
                     ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel());
                     if (!(productSupRelation == null)) {
                         BigDecimal cost = productSupRelation.getCost();
@@ -93,6 +93,23 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                         rechargeOrderBean.setSupName(channel.getChannelName());
                     }
                     return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
+                }else {
+                    logger.info("天猫超市享淘卡官方下单失败");
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(1500);
+                            } catch (InterruptedException e) {
+                                logger.error("InterruptedException", e);
+                            }
+                            ResponseOrder responseOrder = new ResponseOrder();
+                            responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
+                            responseOrder.setResponseCode("01");
+                            channelService.callBack(channel.getChannelId(), responseOrder);
+                        }
+                    }).start();
+                    return new ProcessResult(ProcessResult.FAIL, "订单失败");
                 }
             }
             if (rechargeOrderBean.getProductName().contains("奈雪")) {
