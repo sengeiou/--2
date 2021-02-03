@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.recharge.bean.ProcessResult;
 import com.recharge.bean.ResponseOrder;
 import com.recharge.center.bean.ExtractCardRechargeInfoBean;
-import com.recharge.center.bean.HuaFeiRechargeInfoBean;
 import com.recharge.center.bean.RechargeOrderBean;
 import com.recharge.domain.*;
 import com.recharge.mapper.IChannelMapper;
@@ -75,16 +74,16 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
     @Override
     public ProcessResult recharge(Channel channel, ChannelOrder channelOrder, RechargeOrderBean rechargeOrderBean) {
         ExtractCardRechargeInfoBean extractCardRechargeInfoBean = (ExtractCardRechargeInfoBean) rechargeOrderBean.getRechargeInfoObj(ExtractCardRechargeInfoBean.class);
-        logger.info("卡库充值参数={},RechargeOrderBean={}",JSON.toJSONString(extractCardRechargeInfoBean),JSON.toJSONString(rechargeOrderBean));
+        logger.info("卡库充值参数={},RechargeOrderBean={}", JSON.toJSONString(extractCardRechargeInfoBean), JSON.toJSONString(rechargeOrderBean));
         //平台卡密
         List<PlatformCardInfo> platformCardInfos = cardStockService.outNewCards(channelOrder.getOrderId(), channelOrder.getProductId(), extractCardRechargeInfoBean.getBuyNumber(), rechargeOrderBean.getMerchantId());
         if (CollectionUtils.isEmpty(platformCardInfos)) {
             //如果库存不足
             if (rechargeOrderBean.getProductName().contains("天猫超市享淘卡")) {
                 logger.info("卡库无天猫超时享淘卡,开始天猫享淘卡提卡....");
-                List<Map<String, String>> cards = TianMaoXTKbuy(rechargeOrderBean.getProductName(), channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString());
-                if (!cards.isEmpty()) {
-                    insertBuyCard(cards, rechargeOrderBean);
+                Boolean buy = TianMaoXTKbuy(rechargeOrderBean.getProductName(), channelOrder.getOrderId(), extractCardRechargeInfoBean.getBuyNumber().toString());
+                if (buy) {
+                    logger.info("卡库无天猫超时享淘卡,开始天猫享淘卡提卡....");
                     ProductSupRelation productSupRelation = iProductSupRelationMapper.selectCost(rechargeOrderBean.getProductId(), channel.getChannelId(), rechargeOrderBean.getLevel());
                     if (!(productSupRelation == null)) {
                         BigDecimal cost = productSupRelation.getCost();
@@ -93,20 +92,6 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                         rechargeOrderBean.setSupId(channelOrder.getChannelId());
                         rechargeOrderBean.setSupName(channel.getChannelName());
                     }
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(1500);
-                            } catch (InterruptedException e) {
-                                logger.info("InterruptedException", e);
-                            }
-                            ResponseOrder responseOrder = new ResponseOrder();
-                            responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
-                            responseOrder.setResponseCode("00");
-                            channelService.callBack(channel.getChannelId(), responseOrder);
-                        }
-                    }).start();
                     return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
                 }
             }
@@ -241,7 +226,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
                 }
             }).start();
 
-            merchantCardServiceImpl.insertByBatch(platformCardInfos,rechargeOrderBean.getOrderId(),rechargeOrderBean.getMerchantId());
+            merchantCardServiceImpl.insertByBatch(platformCardInfos, rechargeOrderBean.getOrderId(), rechargeOrderBean.getMerchantId());
             return new ProcessResult(ProcessResult.SUCCESS, "订单成功");
         }
 
@@ -275,7 +260,7 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
 
             return cardInfo;
         }).collect(Collectors.toList());
-        merchantCardServiceImpl.insertByBatch(list,rechargeOrderBean.getOrderId(),rechargeOrderBean.getMerchantId());
+        merchantCardServiceImpl.insertByBatch(list, rechargeOrderBean.getOrderId(), rechargeOrderBean.getMerchantId());
     }
 
     @Override
@@ -288,14 +273,40 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
             }
 
             List<Map<String, String>> list = jingDongCardService.queryCardPWD(jdOrderId);
-            if(CollectionUtils.isEmpty(list)){
-            	return new ProcessResult(ProcessResult.PROCESSING, "处理中");
+            if (CollectionUtils.isEmpty(list)) {
+                return new ProcessResult(ProcessResult.PROCESSING, "处理中");
             }
             RechargeOrder rechargeOrder = iRechargeOrderMapper.selectByOrderId(channelOrder.getOrderId());
 
             RechargeOrderBean rechargeOrderBean = new RechargeOrderBean();
             BeanUtils.copyProperties(rechargeOrder, rechargeOrderBean);
             insertBuyCard(list, rechargeOrderBean);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException e) {
+                        logger.error("InterruptedException", e);
+                    }
+                    ResponseOrder responseOrder = new ResponseOrder();
+                    responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
+                    responseOrder.setResponseCode("00");
+                    channelService.callBack(channel.getChannelId(), responseOrder);
+                }
+            }).start();
+            return new ProcessResult(ProcessResult.SUCCESS, "卡密查询成功");
+        }
+        if (channelOrder.getProductName().contains("天猫超市享淘卡")) {//如果是京东卡需要真的去查询
+            List<Map<String, String>> cards = TianMaoXTKQuery(channelOrder.getOrderId());
+            if (cards.isEmpty()) {
+                logger.error("天猫查询无此订单，{}", channelOrder);
+                return new ProcessResult(ProcessResult.UNKOWN, "订单不存在");
+            }
+            RechargeOrder rechargeOrder = iRechargeOrderMapper.selectByOrderId(channelOrder.getOrderId());
+            RechargeOrderBean rechargeOrderBean = new RechargeOrderBean();
+            BeanUtils.copyProperties(rechargeOrder, rechargeOrderBean);
+            insertBuyCard(cards, rechargeOrderBean);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -328,16 +339,17 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
 
 
     /**
-     * 天猫享淘卡买卡提卡
+     * 天猫享淘卡买卡
      *
      * @return
      */
-    public List<Map<String, String>> TianMaoXTKbuy(String productName, String rechargeOrderId, String buyNumber) {
+    public Boolean TianMaoXTKbuy(String productName, String rechargeOrderId, String buyNumber) {
+        logger.info("天猫超市享淘卡买卡ing");
         //获取渠道信息
         Channel channel = iChannelMapper.selectByChannelId(configMap.get("xtk_channel"));
         if (channel == null) {
             logger.info("渠道未配置....无法提卡");
-            return new ArrayList<Map<String, String>>();
+            return false;
         }
         //读取配置文件，获取对应的信息
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
@@ -352,8 +364,10 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
         String num = m.replaceAll(" ").trim();
         Long amt = Long.valueOf(num) * 100;
 //        创建淘宝客户端连接对象
+        logger.info("创建淘宝客户端连接对象");
         TaobaoClient buy_client = new DefaultTaobaoClient(url, appKey, appSecret);
         //创建天猫超市享淘卡参数对象
+        logger.info("创建天猫超市享淘卡参数对象");
         TmallPurchaseCardBuyRequest buy_req = new TmallPurchaseCardBuyRequest();
         TmallPurchaseCardBuyRequest.CardBuyRequest cardBuyRequest = new TmallPurchaseCardBuyRequest.CardBuyRequest();
         //设置外部订单ID(必填)
@@ -375,46 +389,65 @@ public class YaJieServiceImpl extends AbsChannelRechargeService {
             logger.error("invoke TianMaoXTK client error {}", e.getErrMsg());
         }
         if (buy_rsp.isSuccess() && buy_rsp.getResult().getSuccess()) {
-//            提交成功之后进行提卡
-            TaobaoClient fetch_client = new DefaultTaobaoClient(url, appKey, appSecret);
-            TmallPurchaseCardFetchRequest fetch_req = new TmallPurchaseCardFetchRequest();
-            TmallPurchaseCardFetchRequest.CardFetchRequest cardFetchRequest = new TmallPurchaseCardFetchRequest.CardFetchRequest();
-            cardFetchRequest.setOuterOrderId(rechargeOrderId);
-            fetch_req.setCardFetchReq(cardFetchRequest);
-            List<TianMaoXTK> cardDTOS = null;
-            TmallPurchaseCardFetchResponse fetch_rsp = null;
-            List<Map<String, String>> cardInfos = new ArrayList<>();
-            try {
-                logger.info("天猫享淘卡提卡" + "==>请求信息==>" + JSON.toJSONString(fetch_req));
-                fetch_rsp = fetch_client.execute(fetch_req);
-                logger.info("天猫享淘卡提卡" + "==>响应信息==>" + JSON.toJSONString(fetch_rsp));
-                String responseJson = JSON.toJSONString(fetch_rsp);
-                String data = JSONObject.parseObject(responseJson).getString("result");
-                String response1 = JSONObject.parseObject(data).getString("response");
-                String cards = JSONObject.parseObject(response1).getString("cards");
-                JSONArray jsonArray = new JSONArray(JSON.parseArray(cards));
-                cardDTOS = JSONObject.parseArray(jsonArray.toJSONString(), TianMaoXTK.class);
-                //卡密解密
-                for (TianMaoXTK cardDTO : cardDTOS) {
-                    String cardPass = cardDTO.getCardPass();
-                    cardDTO.setCardPass(RSAUtil.decrypt(cardPass, privateKey));
-                    Map<String, String> infosMap = new HashMap<>();
-                    infosMap.put(BuyCardInfo.KEY_CARD_NO, cardDTO.getCardNo());
-                    infosMap.put(BuyCardInfo.KEY_CARD_PWD, cardDTO.getCardPass());
-                    infosMap.put(BuyCardInfo.KEY_CARD_EXP_TIME, new SimpleDateFormat("yyyy-MM-dd").format(cardDTO.getExpiredDate()));
-                    cardInfos.add(infosMap);
-                }
-            } catch (Exception e) {
-                logger.error("提卡失败{}", e.getMessage());
-            }
-            return cardInfos;
+            logger.info("购卡成功，订单号为："+rechargeOrderId);
+            return true;
         } else {
-            //提交失败的话
-            logger.info("购卡失败");
-            return new ArrayList<>();
+            logger.info("购卡失败，订单号为："+rechargeOrderId);
+            return false;
         }
     }
 
+    /**
+     * 天猫享淘卡提卡
+     *
+     * @return
+     */
+    public List<Map<String, String>> TianMaoXTKQuery(String rechargeOrderId) {
+        logger.info("天猫超市享淘卡提卡ing");
+        Channel channel = iChannelMapper.selectByChannelId(configMap.get("xtk_channel"));
+        if (channel == null) {
+            logger.info("渠道未配置....无法提卡");
+            return new ArrayList<Map<String, String>>();
+        }
+        //读取配置文件，获取对应的信息
+        JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
+        String url = configJSONObject.getString("rechargeUrl");
+        String appKey = configJSONObject.getString("appKey");
+        String appSecret = configJSONObject.getString("appSecret");
+//            提交成功之后进行提卡
+        TaobaoClient fetch_client = new DefaultTaobaoClient(url, appKey, appSecret);
+        TmallPurchaseCardFetchRequest fetch_req = new TmallPurchaseCardFetchRequest();
+        TmallPurchaseCardFetchRequest.CardFetchRequest cardFetchRequest = new TmallPurchaseCardFetchRequest.CardFetchRequest();
+        cardFetchRequest.setOuterOrderId(rechargeOrderId);
+        fetch_req.setCardFetchReq(cardFetchRequest);
+        List<TianMaoXTK> cardDTOS = null;
+        TmallPurchaseCardFetchResponse fetch_rsp = null;
+        List<Map<String, String>> cardInfos = new ArrayList<>();
+        try {
+            logger.info("天猫享淘卡提卡" + "==>请求信息==>" + JSON.toJSONString(fetch_req));
+            fetch_rsp = fetch_client.execute(fetch_req);
+            logger.info("天猫享淘卡提卡" + "==>响应信息==>" + JSON.toJSONString(fetch_rsp));
+            String responseJson = JSON.toJSONString(fetch_rsp);
+            String data = JSONObject.parseObject(responseJson).getString("result");
+            String response1 = JSONObject.parseObject(data).getString("response");
+            String cards = JSONObject.parseObject(response1).getString("cards");
+            JSONArray jsonArray = new JSONArray(JSON.parseArray(cards));
+            cardDTOS = JSONObject.parseArray(jsonArray.toJSONString(), TianMaoXTK.class);
+            //卡密解密
+            for (TianMaoXTK cardDTO : cardDTOS) {
+                String cardPass = cardDTO.getCardPass();
+                cardDTO.setCardPass(RSAUtil.decrypt(cardPass, privateKey));
+                Map<String, String> infosMap = new HashMap<>();
+                infosMap.put(BuyCardInfo.KEY_CARD_NO, cardDTO.getCardNo());
+                infosMap.put(BuyCardInfo.KEY_CARD_PWD, cardDTO.getCardPass());
+                infosMap.put(BuyCardInfo.KEY_CARD_EXP_TIME, new SimpleDateFormat("yyyy-MM-dd").format(cardDTO.getExpiredDate()));
+                cardInfos.add(infosMap);
+            }
+        } catch (Exception e) {
+            logger.error("提卡失败{}", e.getMessage());
+        }
+        return cardInfos;
+    }
 
 }
 
