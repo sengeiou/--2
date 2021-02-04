@@ -106,6 +106,8 @@ public class DingChangRechargerServiceImpl extends AbsChannelRechargeService {
                     return new ProcessResult(ProcessResult.FAIL, "充值失败");
                 }else if(StringUtils.equals(status, "1")){
                     return new ProcessResult(ProcessResult.PROCESSING, "充值中");
+                }else if(StringUtils.equals(status, "5")){
+                    return new ProcessResult(ProcessResult.FAIL, "订单不存在");
                 }else {
                     return new ProcessResult(ProcessResult.UNKOWN, "查询可疑");
                 }

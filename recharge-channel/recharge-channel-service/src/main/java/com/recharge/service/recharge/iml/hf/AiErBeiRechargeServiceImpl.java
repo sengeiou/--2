@@ -75,17 +75,17 @@ public class AiErBeiRechargeServiceImpl extends AbsChannelRechargeService {
         if (StringUtils.equals(huaFeiRechargeInfoBean.getOperator(), "联通")) {
             productRelation = queryChannelProductId("全国联通话费" + huaFeiRechargeInfoBean.getAmt() + "元", channelId);
             if (productRelation == null) {
-                return new ProcessResult(ProcessResult.FAIL, "提交失败");
+                return new ProcessResult(ProcessResult.FAIL, "供货商商品编号查询失败");
             }
         } else if (StringUtils.equals(huaFeiRechargeInfoBean.getOperator(), "移动")) {
             productRelation = queryChannelProductId("全国移动话费" + huaFeiRechargeInfoBean.getAmt() + "元", channelId);
             if (productRelation == null) {
-                return new ProcessResult(ProcessResult.FAIL, "提交失败");
+                return new ProcessResult(ProcessResult.FAIL, "供货商商品编号查询失败");
             }
         } else {
             productRelation = queryChannelProductId("全国电信话费" + huaFeiRechargeInfoBean.getAmt() + "元", channelId);
             if (productRelation == null) {
-                return new ProcessResult(ProcessResult.FAIL, "提交失败");
+                return new ProcessResult(ProcessResult.FAIL, "供货商商品编号查询失败");
             }
         }
         String productCode = productRelation.getChannelProductId();

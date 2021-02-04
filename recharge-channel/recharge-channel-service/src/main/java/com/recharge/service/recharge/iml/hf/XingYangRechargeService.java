@@ -40,9 +40,17 @@ public class XingYangRechargeService extends AbsChannelRechargeService {
         String Key = configJSONObject.getString("Key");
         String OrderId = channelOrder.getChannelOrderId();
         String Account = huaFeiRechargeInfoBean.getPhone();
-        String Num = "1";
         String NotifyUrl = configJSONObject.getString("notifyUrl");
-        String Amount = huaFeiRechargeInfoBean.getAmt().toString();
+        BigDecimal amt = huaFeiRechargeInfoBean.getAmt();
+        String Num;
+        String Amount;
+        if(amt.intValue()<10){
+            Num = amt.toString();
+            Amount = "1";
+        }else {
+            Num = "1";
+            Amount = huaFeiRechargeInfoBean.getAmt().toString();
+        }
         String ProductType = "1";
         String Sign = DigestUtils.md5Hex(ShopId + UserId + ProductType + OrderId + Account + Amount + Num + Timestamp + Key);
         Map<String, String> map = new TreeMap<String, String>();
