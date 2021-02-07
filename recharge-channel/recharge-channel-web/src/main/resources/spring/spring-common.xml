@@ -263,6 +263,8 @@
 
         <entry key="100135" value-ref="wanBaoGuanAiTongRechargeServiceImpl"/>
 
+        <entry key="100137" value-ref="tianMaoYBRechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->
