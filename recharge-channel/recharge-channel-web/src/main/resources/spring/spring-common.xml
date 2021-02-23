@@ -265,6 +265,8 @@
 
         <entry key="100137" value-ref="tianMaoYBRechargeServiceImpl"/>
 
+        <entry key="100138" value-ref="dingChangKRechargerService"/>
+
     </util:map>
     
     <!-- 业务配置 -->
