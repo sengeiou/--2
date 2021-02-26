@@ -170,7 +170,9 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService{
         map.put("Sign", Sign);
         String requestString = JSONObject.toJSONString(map);
         try {
+            logger.info("荣创,刷新token发送的参数:{}", JSON.toJSONString(map));
             String responseBody = HttpClientUtils.invokeJsonString(url, new StringEntity(requestString), "", "utf-8", 5000);
+            logger.info("荣创,刷新token接收的参数:{}", JSON.toJSONString(map));
             String RetCode = JSONObject.parseObject(responseBody).getString("RetCode");
             if (StringUtils.equals("0000", RetCode)) {
                 String data = JSONObject.parseObject(responseBody).getString("Data");
