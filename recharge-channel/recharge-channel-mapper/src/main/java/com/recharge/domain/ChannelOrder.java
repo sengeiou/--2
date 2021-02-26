@@ -77,6 +77,16 @@ public class ChannelOrder {
      */
     private String rechargeNumber;
 
+    private String channelOrderIdMapping;
+
+    public String getChannelOrderIdMapping() {
+        return channelOrderIdMapping;
+    }
+
+    public void setChannelOrderIdMapping(String channelOrderIdMapping) {
+        this.channelOrderIdMapping = channelOrderIdMapping;
+    }
+
     private BigDecimal cost;
 
     public BigDecimal getCost() {

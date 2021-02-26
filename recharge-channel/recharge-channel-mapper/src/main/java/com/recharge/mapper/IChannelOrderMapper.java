@@ -20,7 +20,9 @@ public interface IChannelOrderMapper {
     int updateOrderState(@Param("channelOrder") ChannelOrder channelOrder , @Param("oldStateArray") String[] oldStateArray);
 
     ChannelOrder selectByChannelOrderId(String channelOrderId);
-    
+
+    ChannelOrder selectByChannelOrderIdMapping(String channelOrderIdMapping);
+
     ChannelOrder selectByChannelOrderIdByTime(@Param("channelOrderId") String channelOrderId,@Param("start")String start);
 
     ChannelOrder selectByOutChannelOrderId(String outChannelOrderId);
@@ -32,5 +34,8 @@ public interface IChannelOrderMapper {
     int updateQueryCount(ChannelOrder channelOrder);
 
     ChannelOrder selectByChannelOrderIdOnRecent(@Param("channelOrderId")String channelOrderId,@Param("start")String start);
+
+    int updatechannelOrderIdMapping(@Param("channelOrder") ChannelOrder channelOrder);
+
 
 }

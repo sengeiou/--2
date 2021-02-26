@@ -267,6 +267,10 @@
 
         <entry key="100138" value-ref="dingChangKRechargerService"/>
 
+        <entry key="100139" value-ref="rongChuangRechargeServiceImpl"/>
+
+        <entry key="100140" value-ref="rongXiangRechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->
