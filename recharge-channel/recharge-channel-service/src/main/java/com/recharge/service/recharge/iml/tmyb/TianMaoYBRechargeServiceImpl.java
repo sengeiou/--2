@@ -37,7 +37,7 @@ public class TianMaoYBRechargeServiceImpl extends AbsChannelRechargeService {
     private Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ChannelService channelService;
-    private String channelId = "100106";
+    private String channelId = "100137";
 
     @Override
     public ProcessResult recharge(Channel channel, ChannelOrder channelOrder, RechargeOrderBean rechargeOrderBean) {
@@ -53,7 +53,8 @@ public class TianMaoYBRechargeServiceImpl extends AbsChannelRechargeService {
         String isv_corp_id = configJSONObject.getString("isv_corp_id");
         String url = configJSONObject.getString("rechargeUrl");
         String appSecret = configJSONObject.getString("appSecret");
-
+        String taskName = configJSONObject.getString("task_name");
+        String blessing = configJSONObject.getString("blessing");
         String timestamp = DateUtil.convertDateToStr(new Date());
         //排序
         SortedMap<String, String> sortParams = new TreeMap<>();
@@ -74,8 +75,8 @@ public class TianMaoYBRechargeServiceImpl extends AbsChannelRechargeService {
         users.add(upi);
         ywParam.setCorp_id(corp_id);
         ywParam.setIsv_corp_id(isv_corp_id);
-        ywParam.setTask_name("周年");
-        ywParam.setBlessing("祝福语");
+        ywParam.setTask_name(taskName);
+        ywParam.setBlessing(blessing);
         ywParam.setUser_info_list(users);
         String param0 = JSON.toJSONString(ywParam);//URLEncoder.encode(JSON.toJSONString(ywParam), "UTF-8");
         sortParams.put("parm0", param0);
