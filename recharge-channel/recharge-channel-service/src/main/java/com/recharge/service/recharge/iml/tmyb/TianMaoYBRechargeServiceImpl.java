@@ -71,7 +71,7 @@ public class TianMaoYBRechargeServiceImpl extends AbsChannelRechargeService {
         UserPointInfo upi = new UserPointInfo();
         upi.setUser_type(user_type);
         upi.setTb_account(tianMaoYuanBaoRechargeInfo.getTbAccount());
-        upi.setPoint(tianMaoYuanBaoRechargeInfo.getPoint().longValue());
+        upi.setPoint(tianMaoYuanBaoRechargeInfo.getPoint());
         users.add(upi);
         ywParam.setCorp_id(corp_id);
         ywParam.setIsv_corp_id(isv_corp_id);
@@ -93,7 +93,6 @@ public class TianMaoYBRechargeServiceImpl extends AbsChannelRechargeService {
         param.put("v", "2.0");
         param.put("sign", DigestUtils.md5Hex(appSecret + sb.toString() + appSecret).toUpperCase());
         param.put("parm0", param0);
-        System.out.println("参数=" + JSON.toJSONString(param));
         try {
             logger.info("TMYB下单接口发送的信息:{}",JSON.toJSONString(param));
             String s = HttpClientUtils.invokeGetHttpWithMap(url, param, "UTF-8", 5000);
