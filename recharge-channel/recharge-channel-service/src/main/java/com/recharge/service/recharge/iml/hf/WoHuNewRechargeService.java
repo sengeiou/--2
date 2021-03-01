@@ -113,6 +113,10 @@ public class WoHuNewRechargeService extends AbsChannelRechargeService {
             String status = jsonObject.getString("order_status");
             if (StringUtils.equals(code, "00000")) {
                 if (StringUtils.equals(status, "finish")) {
+                    String operator_no = jsonObject.getString("operator_no");
+                    if (!StringUtils.isEmpty(operator_no)) {
+                        channelOrder.setOutChannelOrderId(operator_no);
+                    }
                     return new ProcessResult(ProcessResult.SUCCESS, "充值成功");
                 }else if (StringUtils.equals(status, "processing")||StringUtils.equals(status, "wait")||StringUtils.equals(status, "reserve")){
                     return new ProcessResult(ProcessResult.PROCESSING,"充值中");
