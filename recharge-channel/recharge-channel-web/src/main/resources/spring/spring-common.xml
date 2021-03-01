@@ -269,7 +269,7 @@
 
         <entry key="100139" value-ref="rongChuangRechargeServiceImpl"/>
 
-        <entry key="100140" value-ref="rongXiangRechargeServiceImpl"/>
+        <entry key="100140" value-ref="wuYouGouRechargeServiceImpl"/>
 
         <entry key="100141" value-ref="youWangRechargeService"/>
 

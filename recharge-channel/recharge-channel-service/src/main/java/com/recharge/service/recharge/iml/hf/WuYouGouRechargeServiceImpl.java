@@ -30,7 +30,7 @@ import java.util.*;
  * @create 2021/1/13 17:06
  */
 @Service
-public class RongXiangRechargeServiceImpl extends AbsChannelRechargeService {
+public class WuYouGouRechargeServiceImpl extends AbsChannelRechargeService {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -100,15 +100,15 @@ public class RongXiangRechargeServiceImpl extends AbsChannelRechargeService {
         map.put("Sign", Sign);
         String requestString = JSONObject.toJSONString(map);
         try {
-            logger.info("{}荣享,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(map));
+            logger.info("{}无忧购,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(map));
             String responseBody = HttpClientUtils.invokeJsonString(url, new StringEntity(requestString), "", "utf-8", 5000);
-            logger.info("{}荣享,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(map));
+            logger.info("{}无忧购,接收充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(responseBody));
             String RetCode = JSONObject.parseObject(responseBody).getString("RetCode");
             if (StringUtils.equals("1000", RetCode)) {
                 String data = JSONObject.parseObject(responseBody).getString("Data");
                 String decryptdata = RongXiangDESUtil.decrypt(data, md5key);
                 System.out.println("z");
-                return new ProcessResult(ProcessResult.FAIL, "提交成功");
+                return new ProcessResult(ProcessResult.SUCCESS, "提交成功");
             } else if (errorCode.contains(RetCode)) {
                 return new ProcessResult(ProcessResult.FAIL, "提交失败");
             } else {
@@ -117,7 +117,7 @@ public class RongXiangRechargeServiceImpl extends AbsChannelRechargeService {
             }
 //            String key = JSONObject.parseObject(decryptdata).getString("OrderNo");
         } catch (Exception e) {
-            logger.error("荣享订单号: {} send error{}", rechargeOrderBean.getOrderId(), e.getMessage());
+            logger.error("无忧购订单号: {} send error{}", rechargeOrderBean.getOrderId(), e.getMessage());
             return new ProcessResult(ProcessResult.UNKOWN, "未知错误");
         }
     }
@@ -172,11 +172,9 @@ public class RongXiangRechargeServiceImpl extends AbsChannelRechargeService {
         map.put("Sign", Sign);
         String requestString = JSONObject.toJSONString(map);
         try {
-            logger.info("荣享,刷新token发送的参数:{}", JSON.toJSONString(map));
-
+            logger.info("无忧购,刷新token发送的参数:{}", JSON.toJSONString(map));
             String responseBody = HttpClientUtils.invokeJsonString(url, new StringEntity(requestString), "", "utf-8", 5000);
-            logger.info("荣享,刷新token发送的参数:{}", JSON.toJSONString(map));
-
+            logger.info("无忧购,刷新token接收的参数:{}", JSON.toJSONString(responseBody));
             String RetCode = JSONObject.parseObject(responseBody).getString("RetCode");
             if (StringUtils.equals("0000", RetCode)) {
                 String data = JSONObject.parseObject(responseBody).getString("Data");
@@ -200,7 +198,8 @@ public class RongXiangRechargeServiceImpl extends AbsChannelRechargeService {
         Channel channel = new Channel();
 //        channelOrder.setChannelOrderId("cs202101211446");
 //        channelOrder.setChannelOrderId("cs202101211550");
-        channelOrder.setChannelOrderId("cs202101211632");
+//        channelOrder.setChannelOrderId("cs202101211632");
+        channelOrder.setChannelOrderId("cs202103011519");
 //        channel.setRemark2("3132333435363738");
 //        channel.setRemark2("22715B7C5A51583F");
 //        channel.setRemark2("397634236925343E");

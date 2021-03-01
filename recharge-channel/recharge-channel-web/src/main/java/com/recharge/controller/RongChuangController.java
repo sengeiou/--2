@@ -1,5 +1,6 @@
 package com.recharge.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.recharge.bean.ResponseOrder;
 import com.recharge.domain.Channel;
@@ -16,6 +17,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author Administrator
@@ -39,8 +43,11 @@ public class RongChuangController {
     @ResponseBody
     public String callBack(@RequestBody(required = false) RongXiang rongXiang) {
         Channel channel = iChannelMapper.selectByChannelId(channelId);
+        JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
+        String ChannelID = configJSONObject.getString("ChannelID");
+        String User = configJSONObject.getString("User");
+        String BusiType = "0202";
         String md5key = channel.getRemark2();
-//        String md5key = "33463E774F316B74";
         String data = rongXiang.getData();
         String decrypt = RongXiangDESUtil.decrypt(data, md5key);
         JSONObject jsonObject = JSONObject.parseObject(decrypt.trim());
@@ -50,7 +57,16 @@ public class RongChuangController {
         ResponseOrder responseOrder = new ResponseOrder();
         responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
         responseOrder.setResponseCode(retCode);
+        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, String> Date = new LinkedHashMap<>();
+        Date.put("OrderNo",channelOrderIdMapping);
+        String dataString = JSONObject.toJSONString(Date);
+        String dataDES = RongXiangDESUtil.encryptToDES(dataString, md5key);
+        map.put("ChannelID", ChannelID);
+        map.put("User", User);
+        map.put("BusiType", BusiType);
+        map.put("Data", dataDES);
         channelService.callBack(channelId, responseOrder);
-        return "ok";
+        return JSONObject.toJSONString(map);
     }
 }

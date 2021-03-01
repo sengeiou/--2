@@ -3,7 +3,6 @@ package com.recharge.job;
 import com.recharge.domain.Channel;
 import com.recharge.mapper.IChannelMapper;
 import com.recharge.service.recharge.iml.hf.RongChuangRechargeServiceImpl;
-import com.recharge.service.recharge.iml.hf.RongXiangRechargeServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

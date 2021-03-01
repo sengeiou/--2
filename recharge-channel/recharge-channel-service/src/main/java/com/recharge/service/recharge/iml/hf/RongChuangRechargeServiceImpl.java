@@ -100,13 +100,12 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService{
         try {
             logger.info("{}荣创,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(map));
             String responseBody = HttpClientUtils.invokeJsonString(url, new StringEntity(requestString), "", "utf-8", 5000);
-            logger.info("{}荣创,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(map));
+            logger.info("{}荣创,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(responseBody));
             String RetCode = JSONObject.parseObject(responseBody).getString("RetCode");
             if (StringUtils.equals("1000", RetCode)) {
                 String data = JSONObject.parseObject(responseBody).getString("Data");
                 String decryptdata = RongXiangDESUtil.decrypt(data, md5key);
-                System.out.println("z");
-                return new ProcessResult(ProcessResult.FAIL, "提交成功");
+                return new ProcessResult(ProcessResult.SUCCESS, "提交成功");
             } else if (errorCode.contains(RetCode)) {
                 return new ProcessResult(ProcessResult.FAIL, "提交失败");
             } else {
@@ -172,7 +171,7 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService{
         try {
             logger.info("荣创,刷新token发送的参数:{}", JSON.toJSONString(map));
             String responseBody = HttpClientUtils.invokeJsonString(url, new StringEntity(requestString), "", "utf-8", 5000);
-            logger.info("荣创,刷新token接收的参数:{}", JSON.toJSONString(map));
+            logger.info("荣创,刷新token接收的参数:{}", JSON.toJSONString(responseBody));
             String RetCode = JSONObject.parseObject(responseBody).getString("RetCode");
             if (StringUtils.equals("0000", RetCode)) {
                 String data = JSONObject.parseObject(responseBody).getString("Data");
@@ -196,13 +195,15 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService{
         Channel channel = new Channel();
 //        channelOrder.setChannelOrderId("cs202101211446");
 //        channelOrder.setChannelOrderId("cs202101211550");
-        channelOrder.setChannelOrderId("cs202101211632");
+        channelOrder.setChannelOrderId("cs202103011519");
 //        channel.setRemark2("3132333435363738");
 //        channel.setRemark2("22715B7C5A51583F");
 //        channel.setRemark2("397634236925343E");
-        channel.setRemark2("33463E774F316B74");
-        channel.setConfigInfo("{rechargeUrl:\"http://220.250.52.18:30000\",ChannelID:\"1114\",User:\"psxx01\",md5key:\"3F3760653979355C\",callBackUrl:\"http://115.28.88.114:8082/rongXiang/callBack\",RequestStr:\"HUxI8h0a\"}");
+        channel.setRemark2("644135535A792931");
+        channel.setConfigInfo("{rechargeUrl:\"http://220.250.52.18:30000\",ChannelID:\"1117\",User:\"njyj01\",md5key:\"3132333435363738\",callBackUrl:\"http://115.28.88.114:8082/rongChuang/callBack\",RequestStr:\"HUxI8h0a\"}");
         ProcessResult recharge = recharge(channel, channelOrder, new RechargeOrderBean());
+//        String s = signIn(channel);
+
 //        String s = signIn(channel);
         System.out.println("z");
     }
