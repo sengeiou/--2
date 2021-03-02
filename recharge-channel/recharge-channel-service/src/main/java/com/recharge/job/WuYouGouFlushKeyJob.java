@@ -8,11 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Administrator
  * @create 2021/1/21 15:27
  */
+@Service
 public class WuYouGouFlushKeyJob {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -29,13 +31,13 @@ public class WuYouGouFlushKeyJob {
         String s = wuYouGouRechargeService.signIn(channel);
         if (!(StringUtils.equals("fail",s))){
             logger.info("无忧购刷新token成功:{}", s);
-            iChannelMapper.updateToken("",s,channelId);
+            iChannelMapper.updateToken("无忧购话费",s,channelId);
         }else {
             logger.info("无忧购开始第二次刷新token");
             String s1 = wuYouGouRechargeService.signIn(channel);
             if (!(StringUtils.equals("fail",s1))){
                 logger.info("无忧购第二次刷新token成功:{}", s1);
-                iChannelMapper.updateToken("",s,channelId);
+                iChannelMapper.updateToken("无忧购话费",s,channelId);
             }else {
             }
         }
