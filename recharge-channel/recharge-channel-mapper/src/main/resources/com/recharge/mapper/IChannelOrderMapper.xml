@@ -22,7 +22,7 @@
         <result column="query_count" property="queryCount" jdbcType="INTEGER" />
         <result column="recharge_number" property="rechargeNumber" jdbcType="VARCHAR" />
         <result column="cost" property="cost" jdbcType="DECIMAL" />
-        <result column="channel_orderId_mapping" property="channelOrderIdMapping" jdbcType="DECIMAL" />
+        <result column="channel_orderId_mapping" property="channelOrderIdMapping" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="Base_Column_List" >
@@ -58,7 +58,7 @@
     </select>
 
     <select id="selectByChannelOrderIdMapping" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/> from t_channelorder where channel_order_id_mapping=#{channelOrderIdMapping}
+        SELECT <include refid="Base_Column_List"/> from t_channelorder where channel_orderId_mapping=#{channelOrderIdMapping}
     </select>
 
      <select id="selectByChannelOrderIdByTime" resultMap="BaseResultMap">
@@ -94,7 +94,7 @@
     </select>
 
     <update id="updatechannelOrderIdMapping">
-        update t_channelorder SET channel_order_id_mapping = #{channelOrderIdMapping}  channel_order_id =#{channelOrderId}
+        update t_channelorder SET channel_orderId_mapping = #{channelOrder.channelOrderIdMapping} where channel_order_id =#{channelOrder.channelOrderId}
     </update>
 
 </mapper>

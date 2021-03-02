@@ -21,7 +21,7 @@ public interface IChannelOrderMapper {
 
     ChannelOrder selectByChannelOrderId(String channelOrderId);
 
-    ChannelOrder selectByChannelOrderIdMapping(String channelOrderIdMapping);
+    ChannelOrder selectByChannelOrderIdMapping(@Param("channelOrderIdMapping") String channelOrderIdMapping);
 
     ChannelOrder selectByChannelOrderIdByTime(@Param("channelOrderId") String channelOrderId,@Param("start")String start);
 
