@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.recharge.bean.ResponseOrder;
 import com.recharge.domain.Channel;
-import com.recharge.domain.ChannelOrder;
+import com.recharge.domain.ChannelOrderSupRelation;
 import com.recharge.domain.RongXiang;
 import com.recharge.mapper.IChannelMapper;
-import com.recharge.mapper.IChannelOrderMapper;
+import com.recharge.mapper.IChannelOrderSupRelationMapper;
 import com.recharge.service.ChannelService;
 import com.recharge.utils.RongXiangDESUtil;
 import org.slf4j.Logger;
@@ -35,13 +35,14 @@ public class RongChuangController {
     private IChannelMapper iChannelMapper;
 
     @Autowired
-    private IChannelOrderMapper iChannelOrderMapper;
+    private IChannelOrderSupRelationMapper IChannelOrderSupRelationMapper;
 
     private String channelId="100139";
 
     @RequestMapping("/callBack")
     @ResponseBody
     public String callBack(@RequestBody(required = false) RongXiang rongXiang) {
+        logger.info("荣创 callback 解密前:{}", JSON.toJSONString(rongXiang));
         Channel channel = iChannelMapper.selectByChannelId(channelId);
         JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
         String ChannelID = configJSONObject.getString("ChannelID");
@@ -51,11 +52,12 @@ public class RongChuangController {
         String data = rongXiang.getData();
         String decrypt = RongXiangDESUtil.decrypt(data, md5key);
         JSONObject jsonObject = JSONObject.parseObject(decrypt.trim());
+        logger.info("荣创 callback 解密后:{}", JSON.toJSONString(jsonObject));
         String channelOrderIdMapping = jsonObject.getString("OrderNo");
         String retCode = jsonObject.getString("RetCode");
-        ChannelOrder channelOrder = iChannelOrderMapper.selectByChannelOrderIdMapping(channelOrderIdMapping);
+        ChannelOrderSupRelation channelOrderSupRelation = IChannelOrderSupRelationMapper.selectBySupOrderId(channelOrderIdMapping);
         ResponseOrder responseOrder = new ResponseOrder();
-        responseOrder.setChannelOrderId(channelOrder.getChannelOrderId());
+        responseOrder.setChannelOrderId(channelOrderSupRelation.getChannelOrderId());
         responseOrder.setResponseCode(retCode);
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String, String> Date = new LinkedHashMap<>();

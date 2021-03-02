@@ -9,8 +9,8 @@ import com.recharge.center.bean.RechargeOrderBean;
 import com.recharge.common.utils.HttpClientUtils;
 import com.recharge.domain.Channel;
 import com.recharge.domain.ChannelOrder;
-import com.recharge.mapper.IChannelOrderMapper;
-import com.recharge.service.ChannelService;
+import com.recharge.domain.ChannelOrderSupRelation;
+import com.recharge.mapper.IChannelOrderSupRelationMapper;
 import com.recharge.service.recharge.AbsChannelRechargeService;
 import com.recharge.utils.RongXiangDESUtil;
 import com.recharge.utils.RongXiangMD5Util;
@@ -33,12 +33,10 @@ import java.util.*;
 public class WuYouGouRechargeServiceImpl extends AbsChannelRechargeService {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private IChannelOrderSupRelationMapper IChannelOrderSupRelationMapper;
 
     private List<String> errorCode = Arrays.asList("0003", "0004", "2002", "2003", "3001", "9001", "9002", "9003", "9004", "9008", "9009", "9010", "2999", "2998", "2997", "2995", "2994");
-
-    @Autowired
-    private IChannelOrderMapper iChannelOrderMapper;
-
 
     @Override
     public ProcessResult recharge(Channel channel, ChannelOrder channelOrder, RechargeOrderBean rechargeOrderBean) {
@@ -53,10 +51,12 @@ public class WuYouGouRechargeServiceImpl extends AbsChannelRechargeService {
         String clientOrderId = channelOrder.getChannelOrderId();
         String substring = clientOrderId.substring(clientOrderId.length() - 5, clientOrderId.length());
         String OrderNo = ChannelID + "173" + BusiType + OrderTime + substring;
-        ChannelOrder newchannelOrder = new ChannelOrder();
+        ChannelOrderSupRelation newchannelOrder = new ChannelOrderSupRelation();
         newchannelOrder.setChannelOrderId(channelOrder.getChannelOrderId());
-        newchannelOrder.setChannelOrderIdMapping(OrderNo);
-        iChannelOrderMapper.updatechannelOrderIdMapping(newchannelOrder);
+        newchannelOrder.setSupOrderId(OrderNo);
+        newchannelOrder.setCreateTime(OrderTime);
+        newchannelOrder.setSupId(channel.getChannelId());
+        IChannelOrderSupRelationMapper.updateSupOrderId(newchannelOrder);
         String operator = huaFeiRechargeInfoBean.getOperator();
         String Operators;
 //        String Operators = "1";
