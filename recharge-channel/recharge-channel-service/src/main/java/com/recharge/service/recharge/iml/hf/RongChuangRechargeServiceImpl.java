@@ -56,7 +56,7 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService{
         newchannelOrder.setSupOrderId(OrderNo);
         newchannelOrder.setCreateTime(OrderTime);
         newchannelOrder.setSupId(channel.getChannelId());
-        IChannelOrderSupRelationMapper.updateSupOrderId(newchannelOrder);
+        IChannelOrderSupRelationMapper.insertOne(newchannelOrder);
         String operator = huaFeiRechargeInfoBean.getOperator();
         String Operators;
 //        String Operators = "1";

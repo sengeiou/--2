@@ -2,21 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.recharge.mapper.IChannelOrderSupRelationMapper">
 
-    <resultMap id="BaseResultMap" type="com.recharge.domain.ChannelOrderSupRelation" >
-        <id column="id" property="id" jdbcType="INTEGER" />
-        <result column="channel_order_id" property="channelOrderId" jdbcType="VARCHAR" />
-        <result column="sup_order_id" property="supOrderId" jdbcType="VARCHAR" />
-        <result column="sup_id" property="supId" jdbcType="VARCHAR" />
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-        <result column="ext_info" property="extInfo" jdbcType="VARCHAR" />
+    <resultMap id="BaseResultMap" type="com.recharge.domain.ChannelOrderSupRelation">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="channel_order_id" property="channelOrderId" jdbcType="VARCHAR"/>
+        <result column="sup_order_id" property="supOrderId" jdbcType="VARCHAR"/>
+        <result column="sup_id" property="supId" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="ext_info" property="extInfo" jdbcType="VARCHAR"/>
     </resultMap>
 
-    <sql id="Base_Column_List" >
+    <sql id="Base_Column_List">
         id, channel_order_id, sup_order_id, sup_id, create_time,ext_info
     </sql>
 
     <select id="selectBySupOrderId" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/> from t_channelorder_sup_relation where sup_order_id=#{supOrderId}
+        SELECT
+        <include refid="Base_Column_List"/>
+        from t_channelorder_sup_relation where sup_order_id=#{supOrderId}
     </select>
 
     <update id="updateSupOrderId">
@@ -26,5 +28,14 @@
         ,sup_id=#{ChannelOrderSupRelation.supId}
         where channel_order_id =#{ChannelOrderSupRelation.channelOrderId}
     </update>
+
+    <insert id="insertOne">
+    insert into t_channelorder_sup_relation(channel_order_id,sup_order_id,sup_id,create_time)
+    values(#{ChannelOrderSupRelation.channelOrderId,jdbcType=VARCHAR},
+    #{ChannelOrderSupRelation.supOrderId,jdbcType=VARCHAR},
+    #{ChannelOrderSupRelation.supId,jdbcType=VARCHAR},
+    #{ChannelOrderSupRelation.createTime,jdbcType=TIMESTAMP})
+
+    </insert>
 
 </mapper>
