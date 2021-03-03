@@ -25,7 +25,7 @@ public class YouWangController {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String channelId="100140";
+    private String channelId="100141";
 
     @RequestMapping("/callBack")
     @ResponseBody

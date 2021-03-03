@@ -73,7 +73,7 @@ public class YouWangRechargeService extends AbsChannelRechargeService {
         try {
             logger.info("{}游网,下单接口发送的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(requestMap));
             String responseBody = HttpClientUtils.invokePostString(url, new StringEntity(requestString), "utf-8", 5000);
-            logger.info("{}游网,下单接口接收的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(requestMap));
+            logger.info("{}游网,下单接口接收的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(responseBody));
             String res_code = JSONObject.parseObject(responseBody).getString("res_code");
             if (StringUtils.equals("200",res_code)){
                 return new ProcessResult(ProcessResult.SUCCESS, "提交成功");
@@ -124,7 +124,7 @@ public class YouWangRechargeService extends AbsChannelRechargeService {
                 String result = JSONObject.parseObject(retObject).getString("result");
                 if (StringUtils.equals("70",result)){
                     String operatorOid = JSONObject.parseObject(retObject).getString("operatorOid");
-                    if (!operatorOid.isEmpty()) {
+                    if (!StringUtils.isEmpty(operatorOid)) {
                         channelOrder.setOutChannelOrderId(operatorOid);
                     }
                     return new ProcessResult(ProcessResult.SUCCESS, "充值成功");
