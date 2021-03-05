@@ -51,7 +51,7 @@ public class DingChangKRechargerService extends AbsChannelRechargeService {
         map.put("sign", sign);
         try {
             logger.info("{}鼎昌快充,发送充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(map));
-            String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 5000);
+            String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 10000);
             logger.info("{}鼎昌快充,接收充值的参数:{}", rechargeOrderBean.getOrderId(), JSON.toJSONString(responseBody));
             String code = JSONObject.parseObject(responseBody).getString("code");
             if (StringUtils.equals(code, "1")) {
@@ -91,7 +91,7 @@ public class DingChangKRechargerService extends AbsChannelRechargeService {
         map.put("sign", sign);
         try {
             logger.info("{}鼎昌快充,发送查询的参数:{}", channelOrder.getChannelOrderId(), JSON.toJSONString(map));
-            String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 5000);
+            String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 10000);
             logger.info("{}鼎昌快充,接收查询的参数:{}", channelOrder.getChannelOrderId(), JSON.toJSONString(responseBody));
             String code = JSONObject.parseObject(responseBody).getString("code");
             if (StringUtils.equals(code, "1")) {
@@ -146,7 +146,7 @@ public class DingChangKRechargerService extends AbsChannelRechargeService {
         map.put("datetime", datetime);
         map.put("sign", sign);
         try {
-            String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 5000);
+            String responseBody = HttpClientUtils.invokePostHttp(url, map, "utf-8", 10000);
             String code = JSONObject.parseObject(responseBody).getString("code");
             if (StringUtils.equals(code, "1")) {
                 String balance = JSONObject.parseObject(responseBody).getString("balance");

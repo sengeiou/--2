@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -192,6 +193,52 @@ public class WuYouGouRechargeServiceImpl extends AbsChannelRechargeService {
         return "fail";
     }
 
+    @Override
+    public BigDecimal balanceQuery(Channel channel) {
+        JSONObject configJSONObject = JSON.parseObject(channel.getConfigInfo());
+        String url = configJSONObject.getString("rechargeUrl");
+        String ChannelID = configJSONObject.getString("ChannelID");
+        String User = configJSONObject.getString("User");
+        String BusiType = "0303";
+        String md5key = channel.getRemark2();
+        String OrderTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        String substring = OrderTime.substring(OrderTime.length() - 7, OrderTime.length() - 2);
+        String OrderNo = ChannelID + "173" + BusiType + OrderTime + substring;
+        Map<String, String> Data = new LinkedHashMap<>();
+        Data.put("OrderNo", OrderNo);
+        String dataString = JSONObject.toJSONString(Data);
+        String dataDES = RongXiangDESUtil.encryptToDES(dataString, md5key);
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("ChannelID", ChannelID);
+        map.put("User", User);
+        map.put("BusiType", BusiType);
+        map.put("Data", dataDES);
+        String Sign = RongXiangMD5Util.MD5("ChannelID" + ChannelID
+                + "User" + User
+                + "BusiType" + BusiType
+                + "Data" + dataDES
+                + md5key);
+        map.put("Sign", Sign);
+        String requestString = JSONObject.toJSONString(map);
+        try {
+            logger.info("无忧购,查询余额接口请求的参数:{}", JSON.toJSONString(map));
+            String responseBody = HttpClientUtils.invokeJsonString(url, new StringEntity(requestString), "", "utf-8", 5000);
+            logger.info("无忧购,查询余额接口响应的参数:{}", JSON.toJSONString(responseBody));
+            String RetCode = JSONObject.parseObject(responseBody).getString("RetCode");
+            if (StringUtils.equals("2000", RetCode)) {
+                String data = JSONObject.parseObject(responseBody).getString("Data");
+                String decryptdata = RongXiangDESUtil.decrypt(data, md5key);
+                JSONObject jsonObject = JSONObject.parseObject(decryptdata.trim());
+                String Balance = jsonObject.getString("Balance");
+                return new BigDecimal(Balance).divide(new BigDecimal(100),3,BigDecimal.ROUND_HALF_UP);
+            }else {
+                return BigDecimal.ZERO;
+            }
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
     @Test
     void test() {
         ChannelOrder channelOrder = new ChannelOrder();
@@ -203,10 +250,10 @@ public class WuYouGouRechargeServiceImpl extends AbsChannelRechargeService {
 //        channel.setRemark2("3132333435363738");
 //        channel.setRemark2("22715B7C5A51583F");
 //        channel.setRemark2("397634236925343E");
-        channel.setRemark2("33463E774F316B74");
-        channel.setConfigInfo("{rechargeUrl:\"http://220.250.52.18:30000\",ChannelID:\"1114\",User:\"psxx01\",md5key:\"3F3760653979355C\",callBackUrl:\"http://115.28.88.114:8082/rongXiang/callBack\",RequestStr:\"HUxI8h0a\"}");
-        ProcessResult recharge = recharge(channel, channelOrder, new RechargeOrderBean());
-//        String s = signIn(channel);
+        channel.setRemark2("3132333435363738");
+        channel.setConfigInfo("{rechargeUrl:\"http://58.22.108.126:10001\",ChannelID:\"1054\",User:\"yjwl_wyg\",md5key:\"3132333435363738\",callBackUrl:\"http://115.28.88.114:8082/wuYouGou/callBack\",RequestStr:\"HUxI8h0a\"}");
+//        ProcessResult recharge = recharge(channel, channelOrder, new RechargeOrderBean());
+        String s = signIn(channel);
         System.out.println("z");
     }
 }

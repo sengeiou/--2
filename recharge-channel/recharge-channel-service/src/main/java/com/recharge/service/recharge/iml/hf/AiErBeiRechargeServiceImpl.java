@@ -142,7 +142,7 @@ public class AiErBeiRechargeServiceImpl extends AbsChannelRechargeService {
                 String status = JSONObject.parseObject(responseBody).getString("status");
                 if (StringUtils.equals(status, "success")) {
                     String serial = JSONObject.parseObject(responseBody).getString("serial");
-                    if (!serial.isEmpty()) {
+                    if (!StringUtils.isEmpty(serial)) {
                         channelOrder.setOutChannelOrderId(serial);
                     }
                     return new ProcessResult(ProcessResult.SUCCESS, "充值成功");
