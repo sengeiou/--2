@@ -273,7 +273,7 @@
 
         <entry key="100141" value-ref="youWangRechargeService"/>
 
-
+        <entry key="100144" value-ref="yongZhouRechargeServiceImpl"/>
 
     </util:map>
     
