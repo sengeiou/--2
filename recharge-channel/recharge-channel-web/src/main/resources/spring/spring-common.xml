@@ -275,6 +275,10 @@
 
         <entry key="100144" value-ref="yongZhouRechargeServiceImpl"/>
 
+        <entry key="100145" value-ref="woHuNoHaveVoucherJykRechargeServiceImpl"/>
+
+        <entry key="100146" value-ref="woHuHaveVoucherJykRechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->
