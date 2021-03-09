@@ -281,6 +281,10 @@
 
         <entry key="100147" value-ref="liFangHFNewRechargeService"/>
 
+        <entry key="100148" value-ref="jiuYaDouBiRechargeServiceImpl"/>
+
+        <entry key="100149" value-ref="lingYunRechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->

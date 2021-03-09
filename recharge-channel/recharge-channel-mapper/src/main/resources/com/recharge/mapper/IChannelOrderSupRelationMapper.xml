@@ -21,6 +21,12 @@
         from t_channelorder_sup_relation where sup_order_id=#{supOrderId}
     </select>
 
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        from t_channelorder_sup_relation where channel_order_id=#{channelOrderId}
+    </select>
+
     <update id="updateSupOrderId">
         update t_channelorder_sup_relation SET
         sup_order_id = #{ChannelOrderSupRelation.supOrderId}

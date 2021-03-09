@@ -11,6 +11,8 @@ public interface IChannelOrderSupRelationMapper {
 
     ChannelOrderSupRelation selectBySupOrderId(@Param("supOrderId") String supOrderId);
 
+    ChannelOrderSupRelation selectByOrderId(@Param("channelOrderId") String channelOrderId);
+
     int insertOne(@Param("ChannelOrderSupRelation") ChannelOrderSupRelation ChannelOrderSupRelation);
 
     int updateSupOrderId(@Param("ChannelOrderSupRelation") ChannelOrderSupRelation ChannelOrderSupRelation);
