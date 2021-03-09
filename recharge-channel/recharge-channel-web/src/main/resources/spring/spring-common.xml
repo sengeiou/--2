@@ -279,6 +279,8 @@
 
         <entry key="100146" value-ref="woHuHaveVoucherJykRechargeServiceImpl"/>
 
+        <entry key="100147" value-ref="liFangHFNewRechargeService"/>
+
     </util:map>
     
     <!-- 业务配置 -->
