@@ -73,9 +73,9 @@ public class LiFangHFNewRechargeService extends AbsChannelRechargeService{
         req.setOuterTid(channelOrderId);
         req.setCallback(callback);
         try {
-            logger.info("LiFangNew send recharge request params{} , LiFangNew send recharge BmRechargeMobilePayBillRequest:{}", JSON.toJSONString(requestMap),JSON.toJSONString(req));
+            logger.info("LiFangHFNew send recharge request params{} , LiFangNew send recharge BmRechargeMobilePayBillRequest:{}", JSON.toJSONString(requestMap),JSON.toJSONString(req));
             BmRechargeMobilePayBillResponse response = client.execute(req, accessToken);
-            logger.info("LiFangNew send recharge response:{}", JSON.toJSONString(response));
+            logger.info("LiFangHFNew send recharge response:{}", JSON.toJSONString(response));
             if(response.isSuccess()){ //订单发送成功
                 if (StringUtils.equals(response.getOrderDetailInfo().getRechargeState(), "9")) {
                     return new ProcessResult(ProcessResult.FAIL, "充值失败");
@@ -92,8 +92,7 @@ public class LiFangHFNewRechargeService extends AbsChannelRechargeService{
                 return new ProcessResult(ProcessResult.UNKOWN, "订单状态可疑");
             }
         } catch (ApiException e) {
-            logger.error("send error", e);
-            e.printStackTrace();
+            logger.error("LiFangHFNew send error", e);
             return new ProcessResult(ProcessResult.UNKOWN, "充值请求可疑原因为"+ e.getErrMsg());
         }
     }
@@ -122,9 +121,9 @@ public class LiFangHFNewRechargeService extends AbsChannelRechargeService{
 
         req.setOuterTid(channelOrderId);
         try {
-            logger.info("LiFangNew send query request:{}", JSON.toJSONString(req));
+            logger.info("LiFangHFNew send query request:{}", JSON.toJSONString(req));
             BmOrderCustomGetResponse response = client.execute(req, accessToken);
-            logger.info("LiFangNew send query response param:{}", JSONObject.toJSONString(response));
+            logger.info("LiFangHFNew send query response param:{}", JSONObject.toJSONString(response));
             if (response.getOrderDetailInfo() == null
                     || StringUtils.equals(response.getOrderDetailInfo().getRechargeState(), "9")) {
                 return new ProcessResult(ProcessResult.FAIL, response.getSubMsg());
@@ -138,8 +137,7 @@ public class LiFangHFNewRechargeService extends AbsChannelRechargeService{
                 return new ProcessResult(ProcessResult.UNKOWN, "请求可疑");
             }
         } catch (ApiException e) {
-            logger.error("send error", e);
-            e.printStackTrace();
+            logger.error("LiFangHFNew send error", e);
             return new ProcessResult(ProcessResult.UNKOWN, "请求可疑");
         }
     }
@@ -173,11 +171,11 @@ public class LiFangHFNewRechargeService extends AbsChannelRechargeService{
         requestMap.put("appsecret", appSecret);
         requestMap.put("accessToken", accessToken);
         try {
-            logger.info("LiFangNew send balanceQuery request params:()", JSONObject.toJSONString(requestMap));
+            logger.info("LiFangHFNew send balanceQuery request params:{}", JSONObject.toJSONString(requestMap));
             OpenClient client = new DefaultOpenClient(url, appKey, appSecret);
             FinanceGetAcctInfoRequest req = new FinanceGetAcctInfoRequest();
             FinanceGetAcctInfoResponse response = client.execute(req, accessToken);
-            logger.info("LiFangNew send balanceQuery response:{}", response.toString());
+            logger.info("LiFangHFNew send balanceQuery response:{}", response.toString());
             String balance = response.getAcctInfo().getBalance();
             return new BigDecimal(balance);
         } catch (ApiException e) {
