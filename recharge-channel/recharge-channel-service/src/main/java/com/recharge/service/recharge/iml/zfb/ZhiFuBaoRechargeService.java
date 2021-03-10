@@ -132,12 +132,12 @@ public class ZhiFuBaoRechargeService extends AbsChannelRechargeService {
                     return new ProcessResult(ProcessResult.PROCESSING, "处理中");
                 }
             } else {
-                logger.error("支付宝查询处理中对应的订单号{}",channelOrder.getChannelOrderId());
-                return new ProcessResult(ProcessResult.UNKOWN, "查询未知");
+                logger.info("支付宝查询处理中对应的订单号{}",channelOrder.getChannelOrderId());
+                return new ProcessResult(ProcessResult.PROCESSING, "查询未知");
             }
         } catch (AlipayApiException e) {
-            logger.error("支付宝查询接口发送失败对应的订单号{}",channelOrder.getChannelOrderId());
-            return new ProcessResult(ProcessResult.UNKOWN, "接口发送失败");
+            logger.info("支付宝查询接口发送失败对应的订单号{}",channelOrder.getChannelOrderId());
+            return new ProcessResult(ProcessResult.PROCESSING, "接口发送失败");
         }
 
     }
