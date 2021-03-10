@@ -285,6 +285,8 @@
 
         <entry key="100149" value-ref="lingYunRechargeServiceImpl"/>
 
+        <entry key="100150" value-ref="yongHeRechargeServiceImpl"/>
+
     </util:map>
     
     <!-- 业务配置 -->
