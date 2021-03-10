@@ -6,6 +6,7 @@ import com.recharge.service.ChannelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @author Administrator
  * @create 2021/3/9 10:27
  */
+@Controller
+@RequestMapping("/LiFangHFNew")
 public class LiFangHFNewController {
     @Autowired
     private ChannelService channelService;
@@ -29,7 +32,7 @@ public class LiFangHFNewController {
         responseOrder.setChannelOrderId(outer_tid);
         responseOrder.setResponseCode(recharge_state);
         responseOrder.setOutChannelOrderId(voucher);
-        logger.info("LiFangCallBackController callback :{}", JSON.toJSONString(responseOrder));
+        logger.info("LiFangHFNewCallBackController callback :{}", JSON.toJSONString(responseOrder));
         channelService.callBack(channelId, responseOrder);
         return "success";
     }

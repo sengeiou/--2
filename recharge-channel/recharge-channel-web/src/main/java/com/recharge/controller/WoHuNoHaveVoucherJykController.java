@@ -38,8 +38,8 @@ public class WoHuNoHaveVoucherJykController {
         responseOrder.setChannelOrderId(orderId);
         responseOrder.setResponseCode(orderStatus);
         responseOrder.setOutChannelOrderId(StringUtils.substring(operatorNo, 0 ,90));
-        logger.info("wohu callback :{}", JSON.toJSONString(responseOrder));
-        logger.info("wohu remark1 :{}", responseOrder.getOutChannelOrderId());
+        logger.info("WoHuNoHaveVoucherJyk callback :{}", JSON.toJSONString(responseOrder));
+        logger.info("WoHuNoHaveVoucherJyk remark1 :{}", responseOrder.getOutChannelOrderId());
         channelService.callBack("100145", responseOrder);
         return "success";
     }
