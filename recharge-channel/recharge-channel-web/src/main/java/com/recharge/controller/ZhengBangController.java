@@ -32,20 +32,20 @@ public class ZhengBangController {
 
     @RequestMapping("/callBack")
     @ResponseBody
-    public String callBack(@RequestBody ZhengBang zhengBang) {
+    public String callBack(String agentAcct,String orderId,String status,String voucher,String sign) {
         ResponseOrder responseOrder = new ResponseOrder();
-        responseOrder.setChannelOrderId(zhengBang.getOrderId());
-        responseOrder.setResponseCode(zhengBang.getStatus());
-        responseOrder.setOutChannelOrderId(StringUtils.substring(zhengBang.getVoucher(), 0 ,90));
+        responseOrder.setChannelOrderId(orderId);
+        responseOrder.setResponseCode(status);
+        responseOrder.setOutChannelOrderId(StringUtils.substring(voucher, 0 ,90));
         logger.info("zhengBang callback :{}", JSON.toJSONString(responseOrder));
         logger.info("zhengBang remark1 :{}", responseOrder.getOutChannelOrderId());
         channelService.callBack("100151", responseOrder);
         Map<String,String> map = new HashMap<>();
-        map.put("agentAcct",zhengBang.getAgentAcct());
-        map.put("orderId",zhengBang.getOrderId());
+        map.put("agentAcct",agentAcct);
+        map.put("orderId",orderId);
         map.put("retCode","SUCCESS");
-        String sign = DigestUtils.md5Hex("agentAcct="+zhengBang.getAgentAcct()+"&orderId="+zhengBang.getOrderId()+"&retCode=SUCCESS"+"&key=4e0ac5df2e82548c5f8bdbe2a829da5f");
-        map.put("sign",sign);
+        String sign1 = DigestUtils.md5Hex("agentAcct="+orderId+"&orderId="+orderId+"&retCode=SUCCESS"+"&key=4e0ac5df2e82548c5f8bdbe2a829da5f");
+        map.put("sign",sign1);
         return JSONObject.toJSONString(map);
     }
 
