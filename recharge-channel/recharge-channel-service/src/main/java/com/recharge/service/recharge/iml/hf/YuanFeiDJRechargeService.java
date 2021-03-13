@@ -96,8 +96,8 @@ public class YuanFeiDJRechargeService extends AbsChannelRechargeService {
             }
 
         } catch (Exception e) {
-            logger.error("{}send error{}", rechargeOrderBean.getOrderId(), e);
-            return new ProcessResult(ProcessResult.UNKOWN, "提交可疑");
+            logger.info("{}send error{}", rechargeOrderBean.getOrderId(), e);
+            return new ProcessResult(ProcessResult.UNKOWN, "提交可疑="+e.getMessage());
         }
     }
 
