@@ -93,16 +93,16 @@ public class JiuZhouTuoDaNewRechargeService extends AbsChannelRechargeService {
             if (code.equals("10012")) {
                 return new ProcessResult(ProcessResult.SUCCESS, "提交成功");
             } else if (code.equals("10009") || code.equals("19999")) {
-                return new ProcessResult(ProcessResult.UNKOWN, "提交可疑");
+                return new ProcessResult(ProcessResult.UNKOWN, "提交可疑,错误码="+code);
             } else {
                 return new ProcessResult(ProcessResult.FAIL, "提交失败");
             }
         } catch (ConnectTimeoutException connectException) {
-            logger.error("{}send error", rechargeOrderBean.getOrderId(), connectException);
-            return new ProcessResult(ProcessResult.UNKOWN, "订单请求超时");
+            logger.info("{}send error", rechargeOrderBean.getOrderId(), connectException);
+            return new ProcessResult(ProcessResult.UNKOWN, "订单请求超时="+connectException.getMessage());
         } catch (Exception e) {
-            logger.error("{}send error", rechargeOrderBean.getOrderId(), e);
-            return new ProcessResult(ProcessResult.UNKOWN, "提交可疑");
+            logger.info("{}send error", rechargeOrderBean.getOrderId(), e);
+            return new ProcessResult(ProcessResult.UNKOWN, "提交可疑="+e.getMessage());
         }
 
     }
@@ -143,7 +143,7 @@ public class JiuZhouTuoDaNewRechargeService extends AbsChannelRechargeService {
             }
 
         } catch (Exception e) {
-            logger.error("{}send error", channelOrder.getChannelOrderId(), e);
+            logger.info("{}send error", channelOrder.getChannelOrderId(), e);
             return new ProcessResult(ProcessResult.UNKOWN, "提交可疑");
         }
     }

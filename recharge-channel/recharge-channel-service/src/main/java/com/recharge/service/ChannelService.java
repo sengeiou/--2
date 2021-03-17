@@ -105,6 +105,7 @@ public class ChannelService {
                             channelOrder.setResponseMsg(processResult.getMsg());
                         }
                     } catch (Exception e) {
+                    	e.printStackTrace();
                         logger.info("订单发送渠道出现异常",e);
                         channelOrder.setState(OrderState.UNKOWN);
                         channelOrder.setResponseMsg("发送渠道异常="+e.getMessage());
