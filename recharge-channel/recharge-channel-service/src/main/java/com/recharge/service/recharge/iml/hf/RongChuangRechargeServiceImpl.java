@@ -117,8 +117,8 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService {
             }
 //            String key = JSONObject.parseObject(decryptdata).getString("OrderNo");
         } catch (Exception e) {
-            logger.error("荣创订单号: {} send error{}", rechargeOrderBean.getOrderId(), e.getMessage());
-            return new ProcessResult(ProcessResult.UNKOWN, "未知错误");
+            logger.info("荣创订单号: {} send error{}", rechargeOrderBean.getOrderId(), e.getMessage());
+            return new ProcessResult(ProcessResult.UNKOWN, "未知错误="+e.getMessage());
         }
     }
 
@@ -187,6 +187,7 @@ public class RongChuangRechargeServiceImpl extends AbsChannelRechargeService {
                 return "fail";
             }
         } catch (Exception e) {
+        	logger.info("荣创订单{},刷新token错误:{}",ChannelID,e.getMessage());
             return "fail";
         }
         return "fail";
