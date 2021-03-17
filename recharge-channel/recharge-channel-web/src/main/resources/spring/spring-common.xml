@@ -289,6 +289,8 @@
 
         <entry key="100151" value-ref="zhengBangRechargeService"/>
 
+        <entry key="100153" value-ref="jiuZhouTuoDaNewRechargeService"/>
+
     </util:map>
     
     <!-- 业务配置 -->
