@@ -72,6 +72,7 @@ public class ZhiFuBaoRechargeService extends AbsChannelRechargeService {
             logger.info("zhifubao request param {}", JSON.toJSONString(request));
             try {
                 AlipayFundTransUniTransferResponse response = defaultAlipayClient.certificateExecute(request);
+                logger.info("支付宝下单请求订单号{},返回值{}",channelOrder.getChannelOrderId(),JSON.toJSONString(response));
                 if (response.isSuccess()) {
                     return new ProcessResult(ProcessResult.SUCCESS, "提交成功");
                 } else {
@@ -83,11 +84,11 @@ public class ZhiFuBaoRechargeService extends AbsChannelRechargeService {
                 }
             } catch (AlipayApiException e) {
                 logger.info("zhifubao invoke error", e.getErrMsg());
-                return new ProcessResult(ProcessResult.UNKOWN, "zhifubao invoke error="+e.getErrMsg());
+                return new ProcessResult(ProcessResult.UNKOWN, "zhifubao invoke error="+e.getMessage());
             }
         } catch (AlipayApiException e) {
             logger.info("zhifubao invoke error", e);
-            return new ProcessResult(ProcessResult.UNKOWN, "zhifubao invoke error="+e.getErrMsg());
+            return new ProcessResult(ProcessResult.UNKOWN, "zhifubao invoke error="+e.getMessage());
         }
     }
 
@@ -123,6 +124,7 @@ public class ZhiFuBaoRechargeService extends AbsChannelRechargeService {
                     "\"out_biz_no\":\"" + channelOrder.getChannelOrderId() + "\"," +
                     "  }");
             AlipayFundTransCommonQueryResponse response = alipayClient.certificateExecute(request);
+            logger.info("支付宝查询请求订单号{},返回值{}",channelOrder.getChannelOrderId(),JSON.toJSONString(response));
             if (response.isSuccess()) {
                 if (StringUtils.equals("SUCCESS", response.getStatus())) {
                     return new ProcessResult(ProcessResult.SUCCESS, "转账成功");
@@ -133,11 +135,11 @@ public class ZhiFuBaoRechargeService extends AbsChannelRechargeService {
                 }
             } else {
                 logger.info("支付宝查询处理中对应的订单号{}",channelOrder.getChannelOrderId());
-                return new ProcessResult(ProcessResult.PROCESSING, "查询未知");
+                return new ProcessResult(ProcessResult.PROCESSING, "查询未知="+response.getFailReason());
             }
         } catch (AlipayApiException e) {
             logger.info("支付宝查询接口发送失败对应的订单号{}",channelOrder.getChannelOrderId());
-            return new ProcessResult(ProcessResult.PROCESSING, "接口发送失败");
+            return new ProcessResult(ProcessResult.PROCESSING, "接口发送失败="+e.getMessage());
         }
 
     }
